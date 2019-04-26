@@ -46,12 +46,7 @@ class Game:
             self.clock.tick(60)
 
     def draw_bg(self):
-        if self.curr_type == 0:
-            # draw lines on road
-            line_x = 0
-            for i in range(10):
-                pygame.draw.rect(self.screen,(255,255,0), pygame.Rect(line_x,HEIGHT//2,50,25))
-                line_x += 100
+        self.screen.blit(pygame.image.load('Screenshot_20190409_140137.png'),(0,0))
 
 class Hero:
     def __init__(self):
@@ -59,7 +54,9 @@ class Hero:
         self.y = 20
         self.frame = 0
         self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
-        self.animations = [pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png'), pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-04.png')]
+        self.moveRight = []
+        for i in range(6):
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
         self.rect = self.animation.get_rect()
         self.rect.x = 120
         self.rect.y = 120
@@ -67,7 +64,8 @@ class Hero:
         
 
     def draw(self,screen):
-        screen.blit(self.animation,(self.rect.x,self.rect.y))
+        f = int(self.frame)%6
+        screen.blit(self.moveRight[f],(self.rect.x,self.rect.y))
 
     def move(self, direction):
         if direction == "up":
@@ -78,7 +76,7 @@ class Hero:
             self.rect.x -= 5
         else:
             self.rect.x += 5
-        self.frame += 25
+        self.frame += .25
 
 session = Game()
 session.start()
