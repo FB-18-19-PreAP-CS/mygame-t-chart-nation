@@ -4,10 +4,15 @@ disp = pygame.display.set_mode((500,475))
 
 pygame.display.set_caption("Dungeon Master")
 
-walkright = [pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png')]
-walkleft = [pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png')]
+# walkright = [pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png')]
+# walkleft = [pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png'), pygame.image.load('sensei.png')]
+
+walkright = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png'), pygame.image.load('R4.png'), pygame.image.load('R5.png'), pygame.image.load('R6.png'), pygame.image.load('R7.png'), pygame.image.load('R8.png'), pygame.image.load('R9.png')]
+walkleft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png'), pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'), pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
+
 bg = pygame.image.load('bg.jpg')
-char = pygame.image.load('sensei.png')
+char = pygame.image.load('standing.png')
+tile = pygame.image.load('generic-rpg-tile07.png')
 
 clock = pygame.time.Clock()
 x = 50 
@@ -18,6 +23,17 @@ vel = 5
 left = False
 right = False
 walkcount = 0
+
+
+
+def home_screen:
+    for i in range(0,500):
+        for j in range(0,500):
+            disp.blit(bg, (i,j))
+            
+
+
+
 
 def redrawgamewindow():
     global walkcount
@@ -67,3 +83,5 @@ while run:
     
     
 pygame.quit()
+
+https://www.geeksforgeeks.org/python-display-text-to-pygame-window/
