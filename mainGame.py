@@ -1,4 +1,5 @@
 import pygame
+import time
 
 WIDTH = 800
 HEIGHT = 800
@@ -17,14 +18,19 @@ class Game:
         self.curr_type = 0
         self.existingdoors = []
         image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
-        self.room1 = Room([Door(30,40), Door(650, 200)], image1)
+        self.room1 = Room([Door(60,360), Door(700,360)], image1)
+        self.room2 = Room([Door(50,200), Door(600,260)], image1)
         self.currentRoom = self.room1
 
     def start(self):
         done = False
         # self.bgmusic.play(-1)
+        self.pastRoom = self.currentRoom
+        self.loadRoom(self.currentRoom)
         while not done:
             self.screen.fill((0,0,0))
+            if self.currentRoom != self.pastRoom:
+                self.loadRoom(self.currentRoom)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     done = True
@@ -41,10 +47,18 @@ class Game:
 
             self.draw_bg(self.currentRoom.background)
             self.character.draw(self.screen)
+            for door in self.existingdoors:
+                door.draw(self.screen)
             # self.character.blitme(self.screen)
             pygame.display.flip()
 
-            self.checkCollisions()
+            if self.checkCollisions() == True:
+                self.pastRoom = self.currentRoom
+                if self.currentRoom == self.room1:
+                    self.currentRoom = self.room2
+                else:
+                    self.currentRoom = self.room2
+
 
             # self.check_edge()
 
@@ -53,11 +67,13 @@ class Game:
     def checkCollisions(self):
         for door in self.existingdoors:
             if self.character.rect.colliderect(door.rect):
-                print("eyy") #test
+                return True
+        return False
 
-    def loadRoom(Room):
+    def loadRoom(self, Room):
+        time.sleep(2)
         self.draw_bg(Room.background)
-        for door in self.doorList:
+        for door in Room.doorList:
             self.existingdoors.append(door)
 
     def draw_bg(self, image):
@@ -86,6 +102,7 @@ class Hero:
         else:
             screen.blit(pygame.transform.flip(self.moveRight[f],True,False),(self.rect.x,self.rect.y))
 
+
     def move(self, direction):
         if direction == "up":
             self.rect.y -= 5
@@ -101,15 +118,20 @@ class Hero:
 
 class Door:
     def __init__(self, spawnx, spawny):
-        self.x = spawnx
-        self.y = spawny
-        self.rect.x = 120
-        self.rect.y = 120
+        self.animation = pygame.transform.scale((pygame.image.load('door.png')), (50,50))
+        self.rect = self.animation.get_rect()
+        self.rect.x = spawnx
+        self.rect.y = spawny
+
+    def draw(self,screen):
+        screen.blit(self.animation,(self.rect.x,self.rect.y))
 
     
 class Room:
     def __init__(self, doorList, background):
+        self.doorList = doorList
         self.background = background
+        
         
         
 
