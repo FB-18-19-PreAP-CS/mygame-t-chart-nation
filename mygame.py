@@ -23,25 +23,17 @@ vel = 5
 left = False
 right = False
 walkcount = 0
-game_intro = True
 
 font = pygame.font.Font('freesansbold.ttf',32)
 text = font.render('Dungeon Master', True,(255,255,255),(0,0,0))
 text1 = font.render('Press Backspace to continue',True,(255,255,255),(0,0,0))
 
 def home_screen():
-    # for i in range(0,500):
-    #     for j in range(0,500):
-    #         disp.blit(bg, (i,j))
+    game_intro = True
     while game_intro:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_BACKSPACE]:
-        game_intro = False
-    else:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_BACKSPACE]:
+            game_intro = False
         textrect = text.get_rect()
         textrect.center = (500//2,475//2)
         disp.blit(text,textrect)
@@ -51,6 +43,16 @@ def home_screen():
         pygame.display.update
 
 
+def button(msg,x,y,h,ic,ac,action = None):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    if x + w > mous[0] and y + h > mouse[1] > y:
+        pygame.draw.rect(disp, ac,(x,y,w,h))
+
+        if click[0] == 1 and action != None:
+            action()
+    else:
+        pygame.draw.rect(disp, ic,(x,y,w,h))
 
 def redrawgamewindow():
     global walkcount
@@ -68,11 +70,11 @@ def redrawgamewindow():
         disp.blit(char ,(x,y))
     
     pygame.display.update()
-
+game_intro = True
 run = True
 while run:
     clock.tick(27)
-    home_screen()
+    # home_screen()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
