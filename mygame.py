@@ -46,6 +46,7 @@ def home_screen():
 def button(msg,x,y,h,ic,ac,action = None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
+
     if x + w > mous[0] and y + h > mouse[1] > y:
         pygame.draw.rect(disp, ac,(x,y,w,h))
 
@@ -53,6 +54,16 @@ def button(msg,x,y,h,ic,ac,action = None):
             action()
     else:
         pygame.draw.rect(disp, ic,(x,y,w,h))
+
+    smalltext = pygame.font.Font("freesansbold.ttf",20)
+    textsurf, textrect = text_objects(msg,smalltext)
+    textrect.center = ( (x+(w/2)), (y(h/2)) )
+    disp.blit(textsurf, textrect)
+    
+
+
+
+
 
 def redrawgamewindow():
     global walkcount
@@ -68,35 +79,58 @@ def redrawgamewindow():
         walkcount += 1
     else:
         disp.blit(char ,(x,y))
-    
+   
     pygame.display.update()
-game_intro = True
+
+def quitgame():
+    pygame.quit()
+    quit()
+def game_intro():
+        intro = True
+
+        while intro:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+            textrect = text.get_rect()
+            textrect.center = (500//2,475//2)
+            disp.blit(text,textrect)
+            button('GO!',150,450,100,50,(0,255,0),(0,200,0),game_loop)
+            button("Quit!",550,450,100,50,(255,0,0),(200,0,0),quitgame)
+
+            pygame.display.update()
+            clock.tick(27)
 run = True
-while run:
-    clock.tick(27)
-    # home_screen()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_a] and x > vel:
-        x -= vel
-        left = True
-        right = False
-    if keys[pygame.K_d] and x < 480:
-        x += vel
-        left = False
-        right = True
-    if keys[pygame.K_w] and y > 0:
-        y -= vel
-        left = False
-        right = False
-        walkcount = 0
-    if keys[pygame.K_s] and y <  450:
-        y += vel
-        left = False
-        right = False
-        walkcount = 0
-    redrawgamewindow()
-    
-pygame.quit()
+def game_loop():
+    while run:
+        clock.tick(27)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        game_intro()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a] and x > vel:
+            x -= vel
+            left = True
+            right = False
+        if keys[pygame.K_d] and x < 480:
+            x += vel
+            left = False
+            right = True
+        if keys[pygame.K_w] and y > 0:
+            y -= vel
+            left = False
+            right = False
+            walkcount = 0
+        if keys[pygame.K_s] and y <  450:
+            y += vel
+            left = False
+            right = False
+            walkcount = 0
+        redrawgamewindow()
+        pygame.display.update()
+        
+    pygame.quit()
+
+# https://pythonprogramming.net/pygame-button-function/?completed=/placing-text-pygame-buttons/
