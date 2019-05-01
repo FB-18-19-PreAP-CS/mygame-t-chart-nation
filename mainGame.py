@@ -14,20 +14,20 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
-        self.bgmusic = pygame.mixer.music.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/escape!.mp3')
+        self.bgmusic = pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
         self.character = Hero()
         self.curr_type = 0
         self.existingdoors = []
-        image1 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/dunegon.png')
-        image2 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/thanos.jpg')
-        image3 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/endgame.png')
-        image4 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/thanos3.jpg')
-        image5 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/thanos4.jpg')
-        image2 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/thanos5.jpg')
-        image6 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/thanos6.jpg')
-        image7 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/thanos7.png')
-        image8 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/loss.png')
-        image9 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/loss2.jpg')
+        image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
+        image2 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos.jpg')
+        image3 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/endgame.png')
+        image4 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos3.jpg')
+        image5 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos4.jpg')
+        image2 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos5.jpg')
+        image6 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos6.jpg')
+        image7 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos7.png')
+        image8 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/loss.png')
+        image9 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/loss2.jpg')
         self.room1 = Room([Door(60,360), Door(700,360)], image1)
         self.room2 = Room([Door(60,360), Door(700,360)], image2)
         self.room3 = Room([Door(60,360), Door(700,360)], image3)
@@ -43,7 +43,7 @@ class Game:
 
     def start(self):
         done = False
-        pygame.mixer.music.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/escape!.mp3')
+        pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
@@ -65,6 +65,11 @@ class Game:
                 self.character.move('left')
             if pressed[pygame.K_RIGHT]:
                 self.character.move('right')
+            if pressed[pygame.K_SPACE]:
+                self.character.attackAnimation = 1
+            if self.character.attackAnimation != 0:
+                self.character.attack(self.character.attackAnimation-1, self.screen)
+                self.character.attackAnimation = (self.character.attackAnimation + 1) % 6 
 
             self.draw_bg(self.currentRoom.background)
             self.character.draw(self.screen)
@@ -86,6 +91,7 @@ class Game:
                 return True
         return False
 
+
     def loadRoom(self, Room):
         time.sleep(2)
         self.draw_bg(Room.background)
@@ -99,14 +105,17 @@ class Game:
 
 class Hero:
     def __init__(self):
-        self.x = 50
-        self.y = 20
         self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
+        self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
         self.orientation = "right"
         self.moveRight = []
+        self.moveAttack = []
+        self.attackAnimation = 0
+        self.attacking = False
         for i in range(6):
-            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
+        for i in range(6):
+            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (120,120)))
         self.rect = self.animation.get_rect()
         self.rect.x = 120
         self.rect.y = 120
@@ -133,6 +142,11 @@ class Hero:
             self.orientation = "right"
             self.rect.x += 5
         self.frame += .25
+
+    def attack(self, animation, screen):
+        screen.blit(self.moveAttack[animation],(self.rect.x,self.rect.y))
+
+
 
 class Door:
     def __init__(self, spawnx, spawny):
