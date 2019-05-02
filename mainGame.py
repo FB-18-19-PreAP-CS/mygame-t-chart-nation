@@ -46,17 +46,17 @@ class Game:
             self.clock.tick(60)
 
     def draw_bg(self):
-        self.screen.blit(pygame.image.load('Screenshot_20190409_140137.png'),(0,0))
+        self.screen.blit(pygame.image.load('floor.jpeg'),(0,0))
 
 class Hero:
     def __init__(self):
         self.x = 50
         self.y = 20
         self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
+        self.animation = pygame.transform.scale((pygame.image.load('images/adventurer-idle-00.png')), (120,120))
         self.moveRight = []
         for i in range(6):
-            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'images/adventurer-run-0{i}.png'), (120,120)))
         self.rect = self.animation.get_rect()
         self.rect.x = 120
         self.rect.y = 120
