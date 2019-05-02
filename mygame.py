@@ -43,11 +43,11 @@ def home_screen():
         pygame.display.update
 
 
-def button(msg,x,y,h,ic,ac,action = None):
+def button(msg,x,y,w,h,ic,ac,action = None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
-    if x + w > mous[0] and y + h > mouse[1] > y:
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:
         pygame.draw.rect(disp, ac,(x,y,w,h))
 
         if click[0] == 1 and action != None:
@@ -57,14 +57,14 @@ def button(msg,x,y,h,ic,ac,action = None):
 
     smalltext = pygame.font.Font("freesansbold.ttf",20)
     textsurf, textrect = text_objects(msg,smalltext)
-    textrect.center = ( (x+(w/2)), (y(h/2)) )
+    textrect.center = ( (x+(w/2)), (y+(h/2)) )
     disp.blit(textsurf, textrect)
     
 
 
-
-
-
+def text_objects(text, font):
+    textsurface = font.render(text, True, (255,255,255))
+    return textsurface, textsurface.get_rect()
 def redrawgamewindow():
     global walkcount
     disp.blit(bg, (0,0))
@@ -96,13 +96,14 @@ def game_intro():
             textrect = text.get_rect()
             textrect.center = (500//2,475//2)
             disp.blit(text,textrect)
-            button('GO!',150,450,100,50,(0,255,0),(0,200,0),game_loop)
-            button("Quit!",550,450,100,50,(255,0,0),(200,0,0),quitgame)
+            button('GO!',100,400,100,50,(0,255,0),(0,200,0),game_loop)
+            button("Quit!",300,400,100,50,(255,0,0),(200,0,0),quitgame)
 
             pygame.display.update()
             clock.tick(27)
 run = True
 def game_loop():
+    run = True
     while run:
         clock.tick(27)
         for event in pygame.event.get():
@@ -128,9 +129,9 @@ def game_loop():
             left = False
             right = False
             walkcount = 0
-        redrawgamewindow()
-        pygame.display.update()
+    redrawgamewindow()
+    pygame.display.update()
         
     pygame.quit()
-
+game_intro()
 # https://pythonprogramming.net/pygame-button-function/?completed=/placing-text-pygame-buttons/
