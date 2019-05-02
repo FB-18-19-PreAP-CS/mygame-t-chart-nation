@@ -1,16 +1,59 @@
 import pygame
 WIDTH = 800
 HEIGHT = 800
-
-class Game:
+from pygame import math as mt
+from random import randint
+win = pygame.display.set_mode((500,480))
+class enemy(object):
+    walkRight = [pygame.image.load('Slime_Walk_0.png'), pygame.image.load('Slime_Walk_1.png'), pygame.image.load('Slime_Walk_2.png'), pygame.image.load('Slime_Walk_3.png')]
+    walkLeft = [pygame.image.load('Slime_Walk_0.png'), pygame.image.load('Slime_Walk_1.png'), pygame.image.load('Slime_Walk_2.png'), pygame.image.load('Slime_Walk_3.png')]
+    # Goes inside the enemy class
+    def move(self):
+        if self.vel > 0:  # If we are moving right
+            if self.x < self.path[1] + self.vel: # If we have not reached the furthest right point on our path.
+                self.x += self.vel
+            else: # Change direction and move back the other way
+                self.vel = self.vel * -1
+                self.x += self.vel
+                self.walkCount = 0
+        else: # If we are moving left
+            if self.x > self.path[0] - self.vel: # If we have not reached the furthest left point on our path
+                self.x += self.vel
+            else:  # Change direction
+                self.vel = self.vel * -1
+                self.x += self.vel
+                self.walkCount = 0
+    def __init__(self, x, y, width, height, end):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.path = [x, end]  # This will define where our enemy starts and finishes their path.
+        self.walkCount = 0
+        self.vel = 3
+    # Goes inside the enemy class
+    def draw(self, screen):
+        self.move()
+        if self.walkCount + 1 >= 33: # Since we have 11 images for each animtion our upper bound is 33. 
+                                    # We will show each image for 3 frames. 3 x 11 = 33.
+            self.walkCount = 0
+            
+        if self.vel > 0: # If we are moving to the right we will display our walkRight images
+            win.blit(self.walkRight[self.walkCount//3], (self.x,self.y))
+            self.walkCount += 1
+        else:  # Otherwise we will display the walkLeft images
+            win.blit(self.walkLeft[self.walkCount//3], (self.x,self.y))
+            self.walkCount += 1
     
+class Game:
 
     def __init__(self):
         pygame.mixer.pre_init(48000,-16,2,2048)
         pygame.mixer.init()
         pygame.init()
-
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        goblin = enemy(100, 410, 64, 64, 300)
+        goblin.draw(win)
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
         # self.bgmusic = pygame.mixer.Sound('/home/blackn/preAPCS/mygame_purdy/sounds/main_theme.ogg')
@@ -38,9 +81,6 @@ class Game:
                 self.character.move('right')
 
             self.draw_bg()
-            enemy   = Enemy(100,100) # spawn enemy
-            enemy_list = pygame.sprite.Group()   # create enemy group 
-            enemy_list.add(enemy)                # add enemy to group
             pygame.display.flip()
             self.character.draw(self.screen)
             
@@ -52,7 +92,9 @@ class Game:
             self.clock.tick(60)
 
     def draw_bg(self):
-        self.screen.blit(pygame.image.load('floor.jpeg'),(0,0))
+       
+        self.screen.blit(pygame.image.load('dunegon.png'),(100,50))
+        self.screen.blit(pygame.image.load('Slime_Walk_1.png'),(100,50))
 
 class Hero:
     def __init__(self):
@@ -86,17 +128,10 @@ class Hero:
 
 session = Game()
 session.start()
-class Enemy(pygame.sprite.Sprite):
-    '''
-    Spawn an enemy
-    '''
-    def __init__(self,x,y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("Slime_Walk_1.png")
-        screen.blt(self.image,0,0)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+
+ 
+
+
     
         
         
