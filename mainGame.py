@@ -40,6 +40,8 @@ class Game:
         self.room10 = Room([Door(60,360), Door(700,360)], image1)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
         self.currentRoom = choice(self.roomList)
+        self.exploredRoomList = []
+        self.exploredRoomList.append(self.currentRoom)
 
     def start(self):
         done = False
@@ -52,19 +54,25 @@ class Game:
             if self.currentRoom != self.pastRoom:
                 self.loadRoom(self.currentRoom)
                 self.pastRoom = self.currentRoom
+            if self.currentRoom not in self.exploredRoomList:
+                self.exploredRoomList.append(self.currentRoom)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     done = True
 
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_UP]:
-                self.character.move('up')
+                if not self.checkEdges("up"):
+                    self.character.move('up')
             if pressed[pygame.K_DOWN]:
-                self.character.move('down')
+                if not self.checkEdges("down"):
+                    self.character.move('down')
             if pressed[pygame.K_LEFT]:
-                self.character.move('left')
+                if not self.checkEdges("left"):
+                    self.character.move('left')
             if pressed[pygame.K_RIGHT]:
-                self.character.move('right')
+                if not self.checkEdges("right"):
+                    self.character.move('right')
             if pressed[pygame.K_SPACE]:
                 self.character.attackAnimation = 1
             if self.character.attackAnimation != 0:
@@ -78,8 +86,14 @@ class Game:
             pygame.display.flip()
 
             if self.checkCollisions() == True:
-                self.currentRoom = choice(self.roomList)
-
+                newRoomLoop = True
+                while newRoomLoop:
+                    room = choice(self.roomList)
+                    if room not in self.exploredRoomList or len(self.exploredRoomList) == len(self.roomList):
+                        if len(self.exploredRoomList) == len(self.roomList):
+                            print("Eyy")
+                        self.currentRoom = room
+                        newRoomLoop = False
 
             # self.check_edge()
 
@@ -89,6 +103,23 @@ class Game:
         for door in self.existingdoors:
             if self.character.rect.colliderect(door.rect):
                 return True
+        return False
+
+    def checkEdges(self, direction):
+        if direction == "up":
+            if self.character.rect.y < 50:
+                return True
+        elif direction == "down":
+            if self.character.rect.y > HEIGHT-250:
+                return True
+        elif direction == "left":
+            if self.character.rect.x < 50:
+                return True
+        elif direction == "right":
+            if self.character.rect.x > WIDTH-170:
+                return True
+        else:
+            print("Direction must be cardinal")
         return False
 
 
@@ -105,6 +136,8 @@ class Game:
 
 class Hero:
     def __init__(self):
+        self.x = 300
+        self.y = 100
         self.frame = 0
         self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
         self.orientation = "right"
