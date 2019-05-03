@@ -109,12 +109,12 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        game_intro()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a] and x > vel:
             x -= vel
             left = True
             right = False
+            
         if keys[pygame.K_d] and x < 480:
             x += vel
             left = False
