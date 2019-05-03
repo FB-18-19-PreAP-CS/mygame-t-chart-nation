@@ -1,50 +1,34 @@
 import pygame
 import time
 from random import choice
-
 WIDTH = 800
 HEIGHT = 800
 win = pygame.display.set_mode((500,480))
-class enemy(object):
-    walkRight = [pygame.image.load('Slime_Walk_0.png'), pygame.image.load('Slime_Walk_1.png'), pygame.image.load('Slime_Walk_2.png'), pygame.image.load('Slime_Walk_3.png')]
-    walkLeft = [pygame.image.load('Slime_Walk_0.png'), pygame.image.load('Slime_Walk_1.png'), pygame.image.load('Slime_Walk_2.png'), pygame.image.load('Slime_Walk_3.png')]
-    # Goes inside the enemy class
+class Enemy(pygame.sprite.Sprite):
+    '''
+    Spawn an enemy
+    '''
+    def __init__(self,x,y,img):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("Slime_Walk_1")
+        self.image.convert_alpha()
+        self.image.set_colorkey(ALPHA)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.counter = 0
     def move(self):
-        if self.vel > 0:  # If we are moving right
-            if self.x < self.path[1] + self.vel: # If we have not reached the furthest right point on our path.
-                self.x += self.vel
-            else: # Change direction and move back the other way
-                self.vel = self.vel * -1
-                self.x += self.vel
-                self.walkCount = 0
-        else: # If we are moving left
-            if self.x > self.path[0] - self.vel: # If we have not reached the furthest left point on our path
-                self.x += self.vel
-            else:  # Change direction
-                self.vel = self.vel * -1
-                self.x += self.vel
-                self.walkCount = 0
-    def __init__(self, x, y, width, height, end):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.path = [x, end]  # This will define where our enemy starts and finishes their path.
-        self.walkCount = 0
-        self.vel = 3
-    # Goes inside the enemy class
-    def draw(self, screen):
-        self.move()
-        if self.walkCount + 1 >= 33: # Since we have 11 images for each animtion our upper bound is 33. 
-                                    # We will show each image for 3 frames. 3 x 11 = 33.
-            self.walkCount = 0
-            
-        if self.vel > 0: # If we are moving to the right we will display our walkRight images
-            win.blit(self.walkRight[self.walkCount//3], (self.x,self.y))
-            self.walkCount += 1
-        else:  # Otherwise we will display the walkLeft images
-            win.blit(self.walkLeft[self.walkCount//3], (self.x,self.y))
-            self.walkCount += 1
+        distance = 20
+        speed = 15
+        if self.counter >= 0 and self.counter <= distance:
+            self.rect.x += speed
+        elif self.counter >= distance and self.counter <= distance*2:
+            self.rect.x -= speed
+        else:
+            self.counter = 0
+
+        self.counter += 1
+
 class Game:
     def __init__(self):
         pygame.mixer.pre_init(48000,-16,2,2048)
@@ -59,15 +43,15 @@ class Game:
         self.curr_type = 0
         self.existingdoors = []
         image1 = pygame.image.load('dunegon.png')
-        image2 = pygame.image.load('thanos.jpg')
-        image3 = pygame.image.load('endgame.png')
-        image4 = pygame.image.load('thanos3.jpg')
-        image5 = pygame.image.load('thanos4.jpg')
-        image2 = pygame.image.load('thanos5.jpg')
-        image6 = pygame.image.load('thanos6.jpg')
-        image7 = pygame.image.load('thanos7.png')
-        image8 = pygame.image.load('loss.png')
-        image9 = pygame.image.load('loss2.jpg')
+        image2 = pygame.image.load('dunegon.png')
+        image3 = pygame.image.load('dunegon.png')
+        image4 = pygame.image.load('dunegon.png')
+        image5 = pygame.image.load('dunegon.png')
+        image2 = pygame.image.load('dunegon.png')
+        image6 = pygame.image.load('dunegon.png')
+        image7 = pygame.image.load('dunegon.png')
+        image8 = pygame.image.load('dunegon.png')
+        image9 = pygame.image.load('dunegon.png')
         self.room1 = Room([Door(60,360), Door(700,360)], image1)
         self.room2 = Room([Door(60,360), Door(700,360)], image2)
         self.room3 = Room([Door(60,360), Door(700,360)], image3)
@@ -80,10 +64,11 @@ class Game:
         self.room10 = Room([Door(60,360), Door(700,360)], image1)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
         self.currentRoom = choice(self.roomList)
-        self.exploredRoomList = []
-        self.exploredRoomList.append(self.currentRoom)
 
     def start(self):
+        enemy   = Enemy(20,200,'yeti.png')# spawn enemy
+        enemy_list = pygame.sprite.Group()   # create enemy group 
+        enemy_list.add(enemy)       
         goblin = enemy(100, 410, 64, 64, 300)
         done = False
         pygame.mixer.music.load('541681556736144.ogg')
@@ -91,30 +76,26 @@ class Game:
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
         while not done:
-            goblin = enemy(100, 410, 64, 64, 300)
+            enemy_list.draw(self.screen)
+            for e in enemy_list:
+                e.move()
             self.screen.fill((0,0,0))
             if self.currentRoom != self.pastRoom:
                 self.loadRoom(self.currentRoom)
                 self.pastRoom = self.currentRoom
-            if self.currentRoom not in self.exploredRoomList:
-                self.exploredRoomList.append(self.currentRoom)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     done = True
 
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_UP]:
-                if not self.checkEdges("up"):
-                    self.character.move('up')
+                self.character.move('up')
             if pressed[pygame.K_DOWN]:
-                if not self.checkEdges("down"):
-                    self.character.move('down')
+                self.character.move('down')
             if pressed[pygame.K_LEFT]:
-                if not self.checkEdges("left"):
-                    self.character.move('left')
+                self.character.move('left')
             if pressed[pygame.K_RIGHT]:
-                if not self.checkEdges("right"):
-                    self.character.move('right')
+                self.character.move('right')
             if pressed[pygame.K_SPACE]:
                 self.character.attackAnimation = 1
             if self.character.attackAnimation != 0:
@@ -130,14 +111,8 @@ class Game:
             goblin.draw(win)
             pygame.display.update()
             if self.checkCollisions() == True:
-                newRoomLoop = True
-                while newRoomLoop:
-                    room = choice(self.roomList)
-                    if room not in self.exploredRoomList or len(self.exploredRoomList) == len(self.roomList):
-                        if len(self.exploredRoomList) == len(self.roomList):
-                            print("Eyy")
-                        self.currentRoom = room
-                        newRoomLoop = False
+                self.currentRoom = choice(self.roomList)
+
 
             # self.check_edge()
 
@@ -147,23 +122,6 @@ class Game:
         for door in self.existingdoors:
             if self.character.rect.colliderect(door.rect):
                 return True
-        return False
-
-    def checkEdges(self, direction):
-        if direction == "up":
-            if self.character.rect.y < 50:
-                return True
-        elif direction == "down":
-            if self.character.rect.y > HEIGHT-250:
-                return True
-        elif direction == "left":
-            if self.character.rect.x < 50:
-                return True
-        elif direction == "right":
-            if self.character.rect.x > WIDTH-170:
-                return True
-        else:
-            print("Direction must be cardinal")
         return False
 
 
@@ -181,8 +139,6 @@ class Game:
         
 class Hero:
     def __init__(self):
-        self.x = 300
-        self.y = 100
         self.frame = 0
         self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00 (1).png')), (120,120))
         self.orientation = "right"
@@ -245,8 +201,12 @@ class Room:
         
         
 
-
-session = Game()
-session.start()
+def main():
+    enemy_images = []
+    enemy_list = ["Slime_Walk_0.png", "Slime_Walk_1.png","Slime_Walk_2","Slime_Walk_3"]
+    for image in enemy_list:
+        enemy_images.append(pygame.image.load(path.join(img_dir,image)).convert_alpha())
+    session = Game()
+    session.start()
 
 
