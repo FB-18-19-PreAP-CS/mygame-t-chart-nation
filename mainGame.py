@@ -29,14 +29,14 @@ class Game:
         image8 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/loss.png')
         image9 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/loss2.jpg')
         self.room1 = Room([Door(60,360), Door(700,360)], image1)
-        self.room2 = Room([Door(60,360), Door(700,360)], image2)
-        self.room3 = Room([Door(60,360), Door(700,360)], image3)
-        self.room4 = Room([Door(60,360), Door(700,360)], image4)
-        self.room5 = Room([Door(60,360), Door(700,360)], image5)
-        self.room6 = Room([Door(60,360), Door(700,360)], image6)
-        self.room7 = Room([Door(60,360), Door(700,360)], image7)
-        self.room8 = Room([Door(60,360), Door(700,360)], image8)
-        self.room9 = Room([Door(60,360), Door(700,360)], image9)
+        self.room2 = Room([Door(60,360), Door(700,360)], image1)
+        self.room3 = Room([Door(60,360), Door(700,360)], image1)
+        self.room4 = Room([Door(60,360), Door(700,360)], image1)
+        self.room5 = Room([Door(60,360), Door(700,360)], image1)
+        self.room6 = Room([Door(60,360), Door(700,360)], image1)
+        self.room7 = Room([Door(60,360), Door(700,360)], image1)
+        self.room8 = Room([Door(60,360), Door(700,360)], image1)
+        self.room9 = Room([Door(60,360), Door(700,360)], image1)
         self.room10 = Room([Door(60,360), Door(700,360)], image1)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
         self.currentRoom = choice(self.roomList)
@@ -61,23 +61,28 @@ class Game:
                     done = True
 
             pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_UP]:
-                if not self.checkEdges("up"):
-                    self.character.move('up')
-            if pressed[pygame.K_DOWN]:
-                if not self.checkEdges("down"):
-                    self.character.move('down')
-            if pressed[pygame.K_LEFT]:
-                if not self.checkEdges("left"):
-                    self.character.move('left')
-            if pressed[pygame.K_RIGHT]:
-                if not self.checkEdges("right"):
-                    self.character.move('right')
+            if not self.character.attacking:
+                if pressed[pygame.K_UP]:
+                    if not self.checkEdges("up"):
+                        self.character.move('up')
+                if pressed[pygame.K_DOWN]:
+                    if not self.checkEdges("down"):
+                        self.character.move('down')
+                if pressed[pygame.K_LEFT]:
+                    if not self.checkEdges("left"):
+                        self.character.move('left')
+                if pressed[pygame.K_RIGHT]:
+                    if not self.checkEdges("right"):
+                        self.character.move('right')
             if pressed[pygame.K_SPACE]:
-                self.character.attackAnimation = 1
-            if self.character.attackAnimation != 0:
-                self.character.attack(self.character.attackAnimation-1, self.screen)
-                self.character.attackAnimation = (self.character.attackAnimation + 1) % 6 
+                self.character.attackAnimation = 0
+            if self.character.attackAnimation != -1:
+                self.character.attackAnimation += .25
+                self.character.attack(((int(self.character.attackAnimation)) % 7), self.screen)
+                if self.character.attackAnimation == 6:
+                    self.character.attackAnimation = -1
+                    self.character.attacking = False 
+
 
             self.draw_bg(self.currentRoom.background)
             self.character.draw(self.screen)
@@ -91,7 +96,7 @@ class Game:
                     room = choice(self.roomList)
                     if room not in self.exploredRoomList or len(self.exploredRoomList) == len(self.roomList):
                         if len(self.exploredRoomList) == len(self.roomList):
-                            print("Eyy")
+                            pass
                         self.currentRoom = room
                         newRoomLoop = False
 
@@ -100,9 +105,8 @@ class Game:
             self.clock.tick(60)
 
     def checkCollisions(self):
-        for door in self.existingdoors:
-            if self.character.rect.colliderect(door.rect):
-                return True
+        if self.character.rect.colliderect(self.existingdoors[1].rect):
+            return True
         return False
 
     def checkEdges(self, direction):
@@ -129,38 +133,42 @@ class Game:
         self.existingdoors = []
         for door in Room.doorList:
             self.existingdoors.append(door)
-        self.character.draw(self.screen)
+        self.character.draw(self.screen,True)
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
 
 class Hero:
     def __init__(self):
-        self.x = 300
-        self.y = 100
         self.frame = 0
         self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
-        self.attackAnimation = 0
+        self.attackAnimation = -1
         self.attacking = False
         for i in range(6):
             self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
         for i in range(6):
             self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (120,120)))
         self.rect = self.animation.get_rect()
-        self.rect.x = 120
-        self.rect.y = 120
+        self.rect.x = 100
+        self.rect.y = 310
 
         
 
-    def draw(self,screen):
-        f = int(self.frame)%6
-        if self.orientation == "right":
-            screen.blit(self.moveRight[f],(self.rect.x,self.rect.y))
+    def draw(self,screen, newScreen=False, attack=False):
+        if newScreen == True:
+            self.rect.x = 100
+            self.rect.y = 310
+        if attack == True:
+            screen.blit(self.moveAttack[int(self.attackAnimation) % 6], (self.rect.x,self.rect.y))
         else:
-            screen.blit(pygame.transform.flip(self.moveRight[f],True,False),(self.rect.x,self.rect.y))
+            f = int(self.frame)%6
+            if self.orientation == "right":
+                screen.blit(self.moveRight[f],(self.rect.x,self.rect.y))
+            else:
+                screen.blit(pygame.transform.flip(self.moveRight[f],True,False),(self.rect.x,self.rect.y))
 
 
     def move(self, direction):
@@ -177,7 +185,7 @@ class Hero:
         self.frame += .25
 
     def attack(self, animation, screen):
-        screen.blit(self.moveAttack[animation],(self.rect.x,self.rect.y))
+        self.draw(screen,False,True)
 
 
 
