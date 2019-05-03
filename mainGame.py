@@ -11,23 +11,23 @@ class Game:
         pygame.mixer.init()
         pygame.init()
 
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("Stalin")
+        self.screen = pygame.self.screenlay.set_mode((WIDTH, HEIGHT))
+        pygame.self.screenlay.set_caption("Stalin")
         self.clock = pygame.time.Clock()
-        self.bgmusic = pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
+        # self.bgmusic = pygame.mixer.music.load('/home/cormierc/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
         self.character = Hero()
         self.curr_type = 0
         self.existingdoors = []
-        image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
-        image2 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos.jpg')
-        image3 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/endgame.png')
-        image4 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos3.jpg')
-        image5 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos4.jpg')
-        image2 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos5.jpg')
-        image6 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos6.jpg')
-        image7 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos7.png')
-        image8 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/loss.png')
-        image9 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/loss2.jpg')
+        image1 = pygame.image.load('dunegon.png')
+        image2 = pygame.image.load('thanos.jpg')
+        image3 = pygame.image.load('endgame.png')
+        image4 = pygame.image.load('thanos3.jpg')
+        image5 = pygame.image.load('thanos4.jpg')
+        image2 = pygame.image.load('thanos5.jpg')
+        image6 = pygame.image.load('thanos6.jpg')
+        image7 = pygame.image.load('thanos7.png')
+        image8 = pygame.image.load('loss.png')
+        image9 = pygame.image.load('loss2.jpg')
         self.room1 = Room([Door(60,360), Door(700,360)], image1)
         self.room2 = Room([Door(60,360), Door(700,360)], image2)
         self.room3 = Room([Door(60,360), Door(700,360)], image3)
@@ -42,11 +42,13 @@ class Game:
         self.currentRoom = choice(self.roomList)
         self.exploredRoomList = []
         self.exploredRoomList.append(self.currentRoom)
+        self.font = pygame.font.Font('freesansbold.ttf',32)
+        self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
 
     def start(self):
         done = False
-        pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
-        pygame.mixer.music.play(-1)
+        # pygame.mixer.music.load('/home/cormierc/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
+        # pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
         while not done:
@@ -83,7 +85,7 @@ class Game:
             self.character.draw(self.screen)
             for door in self.existingdoors:
                 door.draw(self.screen)
-            pygame.display.flip()
+            pygame.self.screenlay.flip()
 
             if self.checkCollisions() == True:
                 newRoomLoop = True
@@ -133,22 +135,62 @@ class Game:
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
+    
+    def button(self,msg,x,y,w,h,ic,ac,action = None):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
 
+        if x + w > mouse[0] > x and y + h > mouse[1] > y:
+            pygame.draw.rect(self.screen, ac,(x,y,w,h))
+
+            if click[0] == 1 and action != None:
+                action()
+        else:
+            pygame.draw.rect(self.screen, ic,(x,y,w,h))
+
+        smalltext = pygame.font.Font("freesansbold.ttf",20)
+        textsurf, textrect = text_objects(msg,smalltext)
+        textrect.center = ( (x+(w/2)), (y+(h/2)) )
+        self.screen.blit(textsurf, textrect)
+    
+    def quitgame(self):
+        pygame.quit()
+        quit()
+
+    def text_objects(self,text, font):
+        textsurface = font.render(text, True, (255,255,255))
+        return textsurface, textsurface.get_rect()
+    
+    def game_intro(self):
+        intro = True
+        while intro:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+            textrect = self.text.get_rect()
+            textrect.center = (500//2,475//2)
+            self.screen.blit(self.text,textrect)
+            self.button('GO!',100,400,100,50,(0,255,0),(0,200,0),session.start())
+            self.button("Quit!",300,400,100,50,(255,0,0),(200,0,0),self.quitgame)
+
+            pygame.self.screenlay.update()
+            clock.tick(27)
 class Hero:
     def __init__(self):
         self.x = 300
         self.y = 100
         self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
+        self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00.png')), (120,120))
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
         self.attackAnimation = 0
         self.attacking = False
         for i in range(6):
-            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'adventurer-run-0{i}.png'), (120,120)))
         for i in range(6):
-            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (120,120)))
+            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'adventurer-attack2-0{i}.png'), (120,120)))
         self.rect = self.animation.get_rect()
         self.rect.x = 120
         self.rect.y = 120
@@ -200,6 +242,5 @@ class Room:
         
         
 
-
 session = Game()
-session.start()
+session.game_intro()
