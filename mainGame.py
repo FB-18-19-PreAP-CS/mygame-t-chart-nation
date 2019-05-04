@@ -14,30 +14,20 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
-        self.bgmusic = pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
         self.character = Hero()
-        self.curr_type = 0
         self.existingdoors = []
-        image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
-        image2 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos.jpg')
-        image3 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/endgame.png')
-        image4 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos3.jpg')
-        image5 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos4.jpg')
-        image2 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos5.jpg')
-        image6 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos6.jpg')
-        image7 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/thanos7.png')
-        image8 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/loss.png')
-        image9 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/loss2.jpg')
-        self.room1 = Room([Door(60,360), Door(700,360)], image1)
-        self.room2 = Room([Door(60,360), Door(700,360)], image1)
-        self.room3 = Room([Door(60,360), Door(700,360)], image1)
-        self.room4 = Room([Door(60,360), Door(700,360)], image1)
-        self.room5 = Room([Door(60,360), Door(700,360)], image1)
-        self.room6 = Room([Door(60,360), Door(700,360)], image1)
-        self.room7 = Room([Door(60,360), Door(700,360)], image1)
-        self.room8 = Room([Door(60,360), Door(700,360)], image1)
-        self.room9 = Room([Door(60,360), Door(700,360)], image1)
-        self.room10 = Room([Door(60,360), Door(700,360)], image1)
+        image1 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/dunegon.png')
+        # Door pattern: left right up down
+        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,120)], image1)
+        self.room2 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room3 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room4 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room5 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room6 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room7 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room8 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room9 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room10 = Room([LockedDoor(35,360), Door(700,360)], image1)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
         self.currentRoom = choice(self.roomList)
         self.exploredRoomList = []
@@ -45,7 +35,7 @@ class Game:
 
     def start(self):
         done = False
-        pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
+        pygame.mixer.music.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
@@ -75,17 +65,20 @@ class Game:
                     if not self.checkEdges("right"):
                         self.character.move('right')
             if pressed[pygame.K_SPACE]:
+                self.character.attacking = True
                 self.character.attackAnimation = 0
             if self.character.attackAnimation != -1:
                 self.character.attackAnimation += .25
                 self.character.attack(((int(self.character.attackAnimation)) % 7), self.screen)
-                if self.character.attackAnimation == 6:
+                if self.character.attackAnimation == 5.75:
                     self.character.attackAnimation = -1
                     self.character.attacking = False 
 
-
             self.draw_bg(self.currentRoom.background)
-            self.character.draw(self.screen)
+            if not self.character.attacking:
+                self.character.draw(self.screen)
+            else:
+                self.character.draw(self.screen,False,True)
             for door in self.existingdoors:
                 door.draw(self.screen)
             pygame.display.flip()
@@ -99,14 +92,14 @@ class Game:
                             pass
                         self.currentRoom = room
                         newRoomLoop = False
-
-            # self.check_edge()
-
+            pygame.display.update()
             self.clock.tick(60)
 
     def checkCollisions(self):
-        if self.character.rect.colliderect(self.existingdoors[1].rect):
-            return True
+        for door in self.existingdoors:
+            if self.character.rect.colliderect(door.rect):
+                if door.__class__.__name__ != "LockedDoor": # https://stackoverflow.com/questions/45667541/how-to-compare-to-type-of-custom-class
+                    return True
         return False
 
     def checkEdges(self, direction):
@@ -141,16 +134,16 @@ class Game:
 class Hero:
     def __init__(self):
         self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
+        self.animation = pygame.transform.scale((pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
         self.attackAnimation = -1
         self.attacking = False
         for i in range(6):
-            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
         for i in range(6):
-            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (120,120)))
+            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (120,120)))
         self.rect = self.animation.get_rect()
         self.rect.x = 100
         self.rect.y = 310
@@ -161,8 +154,11 @@ class Hero:
         if newScreen == True:
             self.rect.x = 100
             self.rect.y = 310
-        if attack == True:
-            screen.blit(self.moveAttack[int(self.attackAnimation) % 6], (self.rect.x,self.rect.y))
+        elif attack == True:
+            if self.orientation == "right":
+                screen.blit(self.moveAttack[int(self.attackAnimation) % 6], (self.rect.x,self.rect.y))
+            else:
+                screen.blit(pygame.transform.flip(self.moveAttack[int(self.attackAnimation) % 6],True,False),(self.rect.x,self.rect.y))
         else:
             f = int(self.frame)%6
             if self.orientation == "right":
@@ -199,7 +195,19 @@ class Door:
     def draw(self,screen):
         screen.blit(self.animation,(self.rect.x,self.rect.y))
 
-    
+class LockedDoor(Door):
+    def __init__(self,spawnx,spawny):
+        super().__init__(spawnx,spawny)
+        self.animation = pygame.transform.scale((pygame.image.load('lockeddoor.png')), (50,50))
+
+class HiddenDoor(Door):
+    def __init__(self,spawnx,spawny):
+        super().__init__(spawnx,spawny)
+        self.rect = pygame.Rect(spawnx,spawny,spawnx+50,spawny+50)
+
+    def draw(self,screen):
+        pass
+  
 class Room:
     def __init__(self, doorList, background):
         self.doorList = doorList
