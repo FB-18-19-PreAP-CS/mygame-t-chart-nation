@@ -173,8 +173,8 @@ class Game:
             textrect = self.text.get_rect()
             textrect.center = (500//2,475//2)
             self.screen.blit(self.text,textrect)
-            self.button('GO!',400,500,100,50,(0,255,0),(0,200,0),session.start())
-            self.button("Quit!",600,500,100,50,(255,0,0),(200,0,0),self.quitgame)
+            self.button('GO!',300,500,100,50,(0,255,0),(0,200,0),session.start())
+            self.button("Quit!",500,500,100,50,(255,0,0),(200,0,0),self.quitgame)
 
             pygame.display.update()
             self.clock.tick(27)
