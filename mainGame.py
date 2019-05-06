@@ -11,8 +11,8 @@ class Game:
         pygame.mixer.init()
         pygame.init()
 
-        self.screen = pygame.self.screenlay.set_mode((WIDTH, HEIGHT))
-        pygame.self.screenlay.set_caption("Stalin")
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
         # self.bgmusic = pygame.mixer.music.load('/home/cormierc/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
         self.character = Hero()
@@ -28,6 +28,7 @@ class Game:
         image7 = pygame.image.load('thanos7.png')
         image8 = pygame.image.load('loss.png')
         image9 = pygame.image.load('loss2.jpg')
+        self.bg = pygame.image.load('R9.png')
         self.room1 = Room([Door(60,360), Door(700,360)], image1)
         self.room2 = Room([Door(60,360), Door(700,360)], image2)
         self.room3 = Room([Door(60,360), Door(700,360)], image3)
@@ -85,7 +86,7 @@ class Game:
             self.character.draw(self.screen)
             for door in self.existingdoors:
                 door.draw(self.screen)
-            pygame.self.screenlay.flip()
+            pygame.display.flip()
 
             if self.checkCollisions() == True:
                 newRoomLoop = True
@@ -135,6 +136,10 @@ class Game:
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
+
+    def text_objects(self,text, font):
+        textsurface = font.render(text, True, (255,255,255))
+        return textsurface, textsurface.get_rect()
     
     def button(self,msg,x,y,w,h,ic,ac,action = None):
         mouse = pygame.mouse.get_pos()
@@ -149,17 +154,13 @@ class Game:
             pygame.draw.rect(self.screen, ic,(x,y,w,h))
 
         smalltext = pygame.font.Font("freesansbold.ttf",20)
-        textsurf, textrect = text_objects(msg,smalltext)
+        textsurf, textrect = self.text_objects(msg,smalltext)
         textrect.center = ( (x+(w/2)), (y+(h/2)) )
         self.screen.blit(textsurf, textrect)
     
     def quitgame(self):
         pygame.quit()
         quit()
-
-    def text_objects(self,text, font):
-        textsurface = font.render(text, True, (255,255,255))
-        return textsurface, textsurface.get_rect()
     
     def game_intro(self):
         intro = True
@@ -168,14 +169,15 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
+            self.screen.blit(self.bg,(0,0))
             textrect = self.text.get_rect()
             textrect.center = (500//2,475//2)
             self.screen.blit(self.text,textrect)
-            self.button('GO!',100,400,100,50,(0,255,0),(0,200,0),session.start())
-            self.button("Quit!",300,400,100,50,(255,0,0),(200,0,0),self.quitgame)
+            self.button('GO!',400,500,100,50,(0,255,0),(0,200,0),session.start())
+            self.button("Quit!",600,500,100,50,(255,0,0),(200,0,0),self.quitgame)
 
-            pygame.self.screenlay.update()
-            clock.tick(27)
+            pygame.display.update()
+            self.clock.tick(27)
 class Hero:
     def __init__(self):
         self.x = 300
