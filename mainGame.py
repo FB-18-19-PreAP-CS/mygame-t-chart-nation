@@ -1,126 +1,137 @@
 import pygame
 import time
 from random import choice
+from pygame import math as mt
+from pygame.locals import *
+import random
 WIDTH = 800
 HEIGHT = 800
-class Enemy(pygame.sprite.Sprite):
-    '''
-    Spawn an enemy
-    '''
-    def __init__(self,x,y,img):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("Slime_Walk_1")
-        self.image.convert_alpha()
-        self.image.set_colorkey(ALPHA)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.counter = 0
-    def move(self):
-        distance = 20
-        speed = 15
-        if self.counter >= 0 and self.counter <= distance:
-            self.rect.x += speed
-        elif self.counter >= distance and self.counter <= distance*2:
-            self.rect.x -= speed
-        else:
-            self.counter = 0
-
-        self.counter += 1
-
+class GameSprite(object):
+     
+    def __init__(self, image, rect):
+        self.image = image
+        self.rect = rect
+        self.sprite = pygame.image.load(image).convert_alpha()
+         
+    def getImage(self): # this method will return a subsurface which represents a portion of the spritesheet
+        self.sprite.set_clip(self.rect) # clip a portion of the sprite with the rectangle object
+        sub_surface = self.sprite.subsurface(self.sprite.get_clip())
+        return pygame.transform.flip(sub_surface, self.flip, False)
 class Game:
     def __init__(self):
         pygame.mixer.pre_init(48000,-16,2,2048)
         pygame.mixer.init()
         pygame.init()
-        
+
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
-        self.bgmusic = pygame.mixer.music.load('541681556736144.ogg')
         self.character = Hero()
-        self.curr_type = 0
         self.existingdoors = []
+        self.enemy_manager = EnemyManager(self.screen,self.character)
+        
         image1 = pygame.image.load('dunegon.png')
-        image2 = pygame.image.load('dunegon.png')
-        image3 = pygame.image.load('dunegon.png')
-        image4 = pygame.image.load('dunegon.png')
-        image5 = pygame.image.load('dunegon.png')
-        image2 = pygame.image.load('dunegon.png')
-        image6 = pygame.image.load('dunegon.png')
-        image7 = pygame.image.load('dunegon.png')
-        image8 = pygame.image.load('dunegon.png')
-        image9 = pygame.image.load('dunegon.png')
-        self.room1 = Room([Door(60,360), Door(700,360)], image1)
-        self.room2 = Room([Door(60,360), Door(700,360)], image2)
-        self.room3 = Room([Door(60,360), Door(700,360)], image3)
-        self.room4 = Room([Door(60,360), Door(700,360)], image4)
-        self.room5 = Room([Door(60,360), Door(700,360)], image5)
-        self.room6 = Room([Door(60,360), Door(700,360)], image6)
-        self.room7 = Room([Door(60,360), Door(700,360)], image7)
-        self.room8 = Room([Door(60,360), Door(700,360)], image8)
-        self.room9 = Room([Door(60,360), Door(700,360)], image9)
-        self.room10 = Room([Door(60,360), Door(700,360)], image1)
+        # Door pattern: left right up down
+        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,120)], image1)
+        self.room2 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room3 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room4 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room5 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room6 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room7 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room8 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room9 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room10 = Room([LockedDoor(35,360), Door(700,360)], image1)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
         self.currentRoom = choice(self.roomList)
+        self.exploredRoomList = []
+        self.exploredRoomList.append(self.currentRoom)
 
     def start(self):
-        enemy   = Enemy(20,200,'yeti.png')# spawn enemy
-        enemy_list = pygame.sprite.Group()   # create enemy group 
-        enemy_list.add(enemy)       
-        goblin = enemy(100, 410, 64, 64, 300)
         done = False
         pygame.mixer.music.load('541681556736144.ogg')
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
         while not done:
-            enemy_list.draw(self.screen)
-            for e in enemy_list:
-                e.move()
+            self.enemy_manager.update()
             self.screen.fill((0,0,0))
             if self.currentRoom != self.pastRoom:
                 self.loadRoom(self.currentRoom)
                 self.pastRoom = self.currentRoom
+            if self.currentRoom not in self.exploredRoomList:
+                self.exploredRoomList.append(self.currentRoom)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     done = True
 
             pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_UP]:
-                self.character.move('up')
-            if pressed[pygame.K_DOWN]:
-                self.character.move('down')
-            if pressed[pygame.K_LEFT]:
-                self.character.move('left')
-            if pressed[pygame.K_RIGHT]:
-                self.character.move('right')
+            if not self.character.attacking:
+                if pressed[pygame.K_UP]:
+                    if not self.checkEdges("up"):
+                        self.character.move('up')
+                if pressed[pygame.K_DOWN]:
+                    if not self.checkEdges("down"):
+                        self.character.move('down')
+                if pressed[pygame.K_LEFT]:
+                    if not self.checkEdges("left"):
+                        self.character.move('left')
+                if pressed[pygame.K_RIGHT]:
+                    if not self.checkEdges("right"):
+                        self.character.move('right')
             if pressed[pygame.K_SPACE]:
-                self.character.attackAnimation = 1
-            if self.character.attackAnimation != 0:
-                self.character.attack(self.character.attackAnimation-1, self.screen)
-                self.character.attackAnimation = (self.character.attackAnimation + 1) % 6 
+                self.character.attacking = True
+                self.character.attackAnimation = 0
+            if self.character.attackAnimation != -1:
+                self.character.attackAnimation += .25
+                self.character.attack(((int(self.character.attackAnimation)) % 7), self.screen)
+                if self.character.attackAnimation == 5.75:
+                    self.character.attackAnimation = -1
+                    self.character.attacking = False 
 
             self.draw_bg(self.currentRoom.background)
-            self.character.draw(self.screen)
+            if not self.character.attacking:
+                self.character.draw(self.screen)
+            else:
+                self.character.draw(self.screen,False,True)
             for door in self.existingdoors:
                 door.draw(self.screen)
             pygame.display.flip()
-            goblin = enemy(100, 410, 64, 64, 300)
-            goblin.draw(self.screen)
-            pygame.display.update()
+
             if self.checkCollisions() == True:
-                self.currentRoom = choice(self.roomList)
-
-
-            # self.check_edge()
-
+                newRoomLoop = True
+                while newRoomLoop:
+                    room = choice(self.roomList)
+                    if room not in self.exploredRoomList or len(self.exploredRoomList) == len(self.roomList):
+                        if len(self.exploredRoomList) == len(self.roomList):
+                            pass
+                        self.currentRoom = room
+                        newRoomLoop = False
+            pygame.display.update()
             self.clock.tick(60)
 
     def checkCollisions(self):
         for door in self.existingdoors:
             if self.character.rect.colliderect(door.rect):
+                if door.__class__.__name__ != "LockedDoor": # https://stackoverflow.com/questions/45667541/how-to-compare-to-type-of-custom-class
+                    return True
+        return False
+
+    def checkEdges(self, direction):
+        if direction == "up":
+            if self.character.rect.y < 50:
                 return True
+        elif direction == "down":
+            if self.character.rect.y > HEIGHT-250:
+                return True
+        elif direction == "left":
+            if self.character.rect.x < 50:
+                return True
+        elif direction == "right":
+            if self.character.rect.x > WIDTH-170:
+                return True
+        else:
+            print("Direction must be cardinal")
         return False
 
 
@@ -130,12 +141,12 @@ class Game:
         self.existingdoors = []
         for door in Room.doorList:
             self.existingdoors.append(door)
-        self.character.draw(self.screen)
+        self.character.draw(self.screen,True)
 
     def draw_bg(self, image):
-        
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
-        
+        self.enemy_manager.draw()
+
 class Hero:
     def __init__(self):
         self.frame = 0
@@ -143,24 +154,33 @@ class Hero:
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
-        self.attackAnimation = 0
+        self.attackAnimation = -1
         self.attacking = False
         for i in range(6):
             self.moveRight.append(pygame.transform.scale(pygame.image.load(f'adventurer-run-0{i} (1).png'), (120,120)))
         for i in range(6):
             self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'adventurer-attack2-0{i} (1).png'), (120,120)))
         self.rect = self.animation.get_rect()
-        self.rect.x = 120
-        self.rect.y = 120
+        self.rect.x = 100
+        self.rect.y = 310
 
         
 
-    def draw(self,screen):
-        f = int(self.frame)%6
-        if self.orientation == "right":
-            screen.blit(self.moveRight[f],(self.rect.x,self.rect.y))
+    def draw(self,screen, newScreen=False, attack=False):
+        if newScreen == True:
+            self.rect.x = 100
+            self.rect.y = 310
+        elif attack == True:
+            if self.orientation == "right":
+                screen.blit(self.moveAttack[int(self.attackAnimation) % 6], (self.rect.x,self.rect.y))
+            else:
+                screen.blit(pygame.transform.flip(self.moveAttack[int(self.attackAnimation) % 6],True,False),(self.rect.x,self.rect.y))
         else:
-            screen.blit(pygame.transform.flip(self.moveRight[f],True,False),(self.rect.x,self.rect.y))
+            f = int(self.frame)%6
+            if self.orientation == "right":
+                screen.blit(self.moveRight[f],(self.rect.x,self.rect.y))
+            else:
+                screen.blit(pygame.transform.flip(self.moveRight[f],True,False),(self.rect.x,self.rect.y))
 
 
     def move(self, direction):
@@ -177,7 +197,7 @@ class Hero:
         self.frame += .25
 
     def attack(self, animation, screen):
-        screen.blit(self.moveAttack[animation],(self.rect.x,self.rect.y))
+        self.draw(screen,False,True)
 
 
 
@@ -191,15 +211,96 @@ class Door:
     def draw(self,screen):
         screen.blit(self.animation,(self.rect.x,self.rect.y))
 
-    
+class LockedDoor(Door):
+    def __init__(self,spawnx,spawny):
+        super().__init__(spawnx,spawny)
+        self.animation = pygame.transform.scale((pygame.image.load('lockeddoor.PNG')), (50,50))
+
+class HiddenDoor(Door):
+    def __init__(self,spawnx,spawny):
+        super().__init__(spawnx,spawny)
+        self.rect = pygame.Rect(spawnx,spawny,spawnx+50,spawny+50)
+
+    def draw(self,screen):
+        pass
+  
 class Room:
     def __init__(self, doorList, background):
         self.doorList = doorList
         self.background = background
         
+class Enemy(object):
+ 
+    def __init__(self, enemy_surface, x, y):
+        self.on = True
+        self.enemy_surface = enemy_surface
+        self.x = x
+        self.y = y
+        self.enemy_pos = mt.Vector2(self.x, self.y)
+ 
+    def update(self):
+        self.y += 0.1
+        self.enemy_pos = mt.Vector2(self.x, self.y)
+
+class EnemyManager(object):
+ 
+    def __init__(self, scene, player):
+ 
+        self.scene = scene
+        self.player = player
+        self.enemy_count = 10
+        self.enemy_list = []
+        self.image = 'Slime_Walk_0.png'
+        self.width = 30
+        self.height = 30
+        self.rect = Rect(0, 0, self.width, self.height)
+        self.more_enemy = 0
+        self.y = -50
+        self.boundary_width = 660
+        self.boundary_height = 660
+ 
+        # initialize game sprite object
+        self.sprite = GameSprite(self.image, self.rect)
+ 
+    def create_enemy(self, x, y):
+        if(self.enemy_count > 0):
+            self.enemy_surface = self.sprite.getImage()
+            self.enemy_list.append(Enemy(self.enemy_surface, x, y))
+            self.enemy_count -= 1
+ 
+    def update(self):
+        if (self.more_enemy > 600):
+            self.more_enemy = 0
+            x = random.randint(30, self.boundary_width - 50)
+            self.create_enemy(x , self.y)  # create more enemy
+        else:
+            self.more_enemy += 1 # increase time
+ 
+        self.enemy_update()
+        self.check_boundary()
+ 
+    def enemy_update(self):
+ 
+        for item in list(self.enemy_list):
+            if(item.on == False):
+                self.enemy_list.remove(item)
+                self.enemy_count += 1
+            else:
+                item.update()
+ 
+    def check_boundary(self):
+        for i in range(len(self.enemy_list)):
+            if (self.enemy_list[i].y > self.boundary_height):
+                self.enemy_list[i].on = False
+ 
+    def draw(self):
+ 
+        # blit the enemy on  the scene
+        for i in range(len(self.enemy_list)):
+            self.scene.blit(self.enemy_list[i].enemy_surface, self.enemy_list[i].enemy_pos)
+
         
-        
 
 
-
-
+session = Game()
+session.start()
