@@ -16,26 +16,27 @@ class Game:
         self.clock = pygame.time.Clock()
         self.character = Hero()
         self.existingdoors = []
-        image1 = pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/dunegon.png')
+        self.existingwalls = []
+        image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
         # Door pattern: left right up down
-        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,120)], image1)
-        self.room2 = Room([LockedDoor(35,360), Door(700,360)], image1)
-        self.room3 = Room([LockedDoor(35,360), Door(700,360)], image1)
-        self.room4 = Room([LockedDoor(35,360), Door(700,360)], image1)
-        self.room5 = Room([LockedDoor(35,360), Door(700,360)], image1)
-        self.room6 = Room([LockedDoor(35,360), Door(700,360)], image1)
-        self.room7 = Room([LockedDoor(35,360), Door(700,360)], image1)
-        self.room8 = Room([LockedDoor(35,360), Door(700,360)], image1)
-        self.room9 = Room([LockedDoor(35,360), Door(700,360)], image1)
-        self.room10 = Room([LockedDoor(35,360), Door(700,360)], image1)
+        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,120)], [Wall(100,100,100,100)], image1)
+        self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.room3 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.room4 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.room5 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.room6 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.room7 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.room8 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.room9 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.room10 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
-        self.currentRoom = choice(self.roomList)
+        self.currentRoom = self.room1 #choice(self.roomList)
         self.exploredRoomList = []
         self.exploredRoomList.append(self.currentRoom)
 
     def start(self):
         done = False
-        pygame.mixer.music.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
+        pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
@@ -53,16 +54,16 @@ class Game:
             pressed = pygame.key.get_pressed()
             if not self.character.attacking:
                 if pressed[pygame.K_UP]:
-                    if not self.checkEdges("up"):
+                    if not self.checkEdges("up") and not self.checkWalls("up"):
                         self.character.move('up')
                 if pressed[pygame.K_DOWN]:
-                    if not self.checkEdges("down"):
+                    if not self.checkEdges("down") and not self.checkWalls("down"):
                         self.character.move('down')
                 if pressed[pygame.K_LEFT]:
-                    if not self.checkEdges("left"):
+                    if not self.checkEdges("left") and not self.checkWalls("left"):
                         self.character.move('left')
                 if pressed[pygame.K_RIGHT]:
-                    if not self.checkEdges("right"):
+                    if not self.checkEdges("right") and not self.checkWalls("right"):
                         self.character.move('right')
             if pressed[pygame.K_SPACE]:
                 self.character.attacking = True
@@ -83,7 +84,7 @@ class Game:
                 door.draw(self.screen)
             pygame.display.flip()
 
-            if self.checkCollisions() == True:
+            if self.checkDoors() == True:
                 newRoomLoop = True
                 while newRoomLoop:
                     room = choice(self.roomList)
@@ -95,11 +96,39 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
 
-    def checkCollisions(self):
+    def checkDoors(self):
         for door in self.existingdoors:
             if self.character.rect.colliderect(door.rect):
                 if door.__class__.__name__ != "LockedDoor": # https://stackoverflow.com/questions/45667541/how-to-compare-to-type-of-custom-class
                     return True
+        return False
+
+    def checkWalls(self,direction):
+        for wall in self.existingwalls:
+            if direction == "up":
+                self.character.rect.y -= 5
+                if self.character.rect.colliderect(wall.rect):
+                    self.character.rect.y += 5
+                    return True
+                self.character.rect.y += 5
+            if direction == "down":
+                self.character.rect.y += 5
+                if self.character.rect.colliderect(wall.rect):
+                    self.character.rect.y -= 5
+                    return True
+                self.character.rect.y -= 5
+            if direction == "left":
+                self.character.rect.x -= 5
+                if self.character.rect.colliderect(wall.rect):
+                    self.character.rect.x += 5
+                    return True
+                self.character.rect.x += 5
+            if direction == "right":
+                self.character.rect.x += 5
+                if self.character.rect.colliderect(wall.rect):
+                    self.character.rect.x -= 5
+                    return True
+                self.character.rect.x -= 5
         return False
 
     def checkEdges(self, direction):
@@ -126,6 +155,8 @@ class Game:
         self.existingdoors = []
         for door in Room.doorList:
             self.existingdoors.append(door)
+        for wall in Room.wallList:
+            self.existingwalls.append(wall)
         self.character.draw(self.screen,True)
 
     def draw_bg(self, image):
@@ -134,16 +165,16 @@ class Game:
 class Hero:
     def __init__(self):
         self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
+        self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
         self.attackAnimation = -1
         self.attacking = False
         for i in range(6):
-            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
         for i in range(6):
-            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'C:/Users/13612/Academics/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (120,120)))
+            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (120,120)))
         self.rect = self.animation.get_rect()
         self.rect.x = 100
         self.rect.y = 310
@@ -198,7 +229,7 @@ class Door:
 class LockedDoor(Door):
     def __init__(self,spawnx,spawny):
         super().__init__(spawnx,spawny)
-        self.animation = pygame.transform.scale((pygame.image.load('lockeddoor.png')), (50,50))
+        self.animation = pygame.transform.scale((pygame.image.load('lockeddoor.PNG')), (50,50))
 
 class HiddenDoor(Door):
     def __init__(self,spawnx,spawny):
@@ -209,9 +240,17 @@ class HiddenDoor(Door):
         pass
   
 class Room:
-    def __init__(self, doorList, background):
+    def __init__(self, doorList, wallList, background):
         self.doorList = doorList
+        self.wallList = wallList
         self.background = background
+
+class Wall:
+    def __init__(self,spawnx,spawny,lenx,leny):
+        self.rect = pygame.Rect(spawnx,spawny,spawnx+lenx,spawny+leny)
+
+    def draw(self):
+        pass
         
         
         
