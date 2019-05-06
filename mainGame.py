@@ -3,7 +3,6 @@ import time
 from random import choice
 WIDTH = 800
 HEIGHT = 800
-win = pygame.display.set_mode((500,480))
 class Enemy(pygame.sprite.Sprite):
     '''
     Spawn an enemy
@@ -108,7 +107,7 @@ class Game:
                 door.draw(self.screen)
             pygame.display.flip()
             goblin = enemy(100, 410, 64, 64, 300)
-            goblin.draw(win)
+            goblin.draw(self.screen)
             pygame.display.update()
             if self.checkCollisions() == True:
                 self.currentRoom = choice(self.roomList)
@@ -201,12 +200,6 @@ class Room:
         
         
 
-def main():
-    enemy_images = []
-    enemy_list = ["Slime_Walk_0.png", "Slime_Walk_1.png","Slime_Walk_2","Slime_Walk_3"]
-    for image in enemy_list:
-        enemy_images.append(pygame.image.load(path.join(img_dir,image)).convert_alpha())
-    session = Game()
-    session.start()
+
 
 
