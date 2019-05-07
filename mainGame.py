@@ -14,11 +14,11 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
-        # self.bgmusic = pygame.mixer.music.load('/home/cormierc/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
+        self.bgmusic = pygame.mixer.music.load('541681556736144.ogg')
         self.character = Hero()
         self.existingdoors = []
         self.existingwalls = []
-        image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
+        image1 = pygame.image.load('dunegon.png')
         # Door pattern: left right up down
         self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,120)], [Wall(100,100,100,100)], image1)
         self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
@@ -31,15 +31,16 @@ class Game:
         self.room9 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
         self.room10 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
-        self.currentRoom = self.room1 #choice(self.roomList)
+        self.currentRoom = choice(self.roomList)
         self.exploredRoomList = []
         self.exploredRoomList.append(self.currentRoom)
         self.font = pygame.font.Font('freesansbold.ttf',32)
         self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
+        self.bg = pygame.image.load('adventurer-die-00.png')
 
     def start(self):
         done = False
-        pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
+        pygame.mixer.music.load('541681556736144.ogg')
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
@@ -197,28 +198,29 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
-            self.screen.blit(self.bg,(0,0))
+            # self.screen.blit(self.bg,(0,0))
+            self.screen.fill((0,0,0))
             textrect = self.text.get_rect()
-            textrect.center = (500//2,475//2)
+            textrect.center = (WIDTH//2,300)
             self.screen.blit(self.text,textrect)
-            self.button('GO!',300,500,100,50,(0,255,0),(0,200,0),session.start())
-            self.button("Quit!",500,500,100,50,(255,0,0),(200,0,0),self.quitgame)
+            self.button('GO!',200,400,100,50,(0,255,0),(0,200,0),self.start)
+            self.button("Quit!",500,400,100,50,(255,0,0),(200,0,0),self.quitgame)
 
             pygame.display.update()
-            self.clock.tick(27)
+            self.clock.tick(60)
 class Hero:
     def __init__(self):
         self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (120,120))
+        self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00.png')), (120,120))
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
         self.attackAnimation = -1
         self.attacking = False
         for i in range(6):
-            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (120,120)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'adventurer-run-0{i}.png'), (120,120)))
         for i in range(6):
-            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (120,120)))
+            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'adventurer-attack2-0{i}.png'), (120,120)))
         self.rect = self.animation.get_rect()
         self.rect.x = 100
         self.rect.y = 310
