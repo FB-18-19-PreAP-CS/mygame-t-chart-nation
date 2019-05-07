@@ -6,17 +6,8 @@ from pygame.locals import *
 import random
 WIDTH = 800
 HEIGHT = 800
-class GameSprite(object):
-     
-    def __init__(self, image, rect):
-        self.image = image
-        self.rect = rect
-        self.sprite = pygame.image.load(image).convert_alpha()
-         
-    def getImage(self): # this method will return a subsurface which represents a portion of the spritesheet
-        self.sprite.set_clip(self.rect) # clip a portion of the sprite with the rectangle object
-        sub_surface = self.sprite.subsurface(self.sprite.get_clip())
-        return pygame.transform.flip(sub_surface, self.flip, False)
+RED = (255,0,0)
+
 class Game:
     def __init__(self):
         pygame.mixer.pre_init(48000,-16,2,2048)
@@ -26,9 +17,9 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
+        self.mob = Mob()
         self.character = Hero()
         self.existingdoors = []
-        self.enemy_manager = EnemyManager(self.screen,self.character)
         
         image1 = pygame.image.load('dunegon.png')
         # Door pattern: left right up down
@@ -53,12 +44,13 @@ class Game:
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
+        
         while not done:
-            self.enemy_manager.update()
             self.screen.fill((0,0,0))
             if self.currentRoom != self.pastRoom:
                 self.loadRoom(self.currentRoom)
                 self.pastRoom = self.currentRoom
+                
             if self.currentRoom not in self.exploredRoomList:
                 self.exploredRoomList.append(self.currentRoom)
             for event in pygame.event.get():
@@ -142,10 +134,12 @@ class Game:
         for door in Room.doorList:
             self.existingdoors.append(door)
         self.character.draw(self.screen,True)
+        self.mob.create_enemy(Game())
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
-        self.enemy_manager.draw()
+    
+        
 
 class Hero:
     def __init__(self):
@@ -228,79 +222,20 @@ class Room:
     def __init__(self, doorList, background):
         self.doorList = doorList
         self.background = background
+
+class Mob(pygame.sprite.Sprite):
+    def __init__(self):
+        self.move_right = [pygame.image.load("Slime_Walk_0.png"),pygame.image.load("Slime_Walk_1.png"),pygame.image.load("Slime_Walk_2.png"),pygame.image.load("Slime_Walk_3.png")]
+        self.move_left = [pygame.image.load("Slime_Walk_0.png"),pygame.image.load("Slime_Walk_1.png"),pygame.image.load("Slime_Walk_2.png"),pygame.image.load("Slime_Walk_3.png")]
+        self.health = 2
+        self.image = pygame.image.load("Slime_Walk_1.png")
+        self.x = random.randint(1,800)
+        self.y = random.randint(1,800)
+    def create_enemy(self,Game):
+        Game.self.screen.blt(self.move_right[0],self.x,self.y)
+        pygame.display.flip
         
-class Enemy(object):
- 
-    def __init__(self, enemy_surface, x, y):
-        self.on = True
-        self.enemy_surface = enemy_surface
-        self.x = x
-        self.y = y
-        self.enemy_pos = mt.Vector2(self.x, self.y)
- 
-    def update(self):
-        self.y += 0.1
-        self.enemy_pos = mt.Vector2(self.x, self.y)
-
-class EnemyManager(object):
- 
-    def __init__(self, scene, player):
- 
-        self.scene = scene
-        self.player = player
-        self.enemy_count = 10
-        self.enemy_list = []
-        self.image = 'Slime_Walk_0.png'
-        self.width = 30
-        self.height = 30
-        self.rect = Rect(0, 0, self.width, self.height)
-        self.more_enemy = 0
-        self.y = -50
-        self.boundary_width = 660
-        self.boundary_height = 660
- 
-        # initialize game sprite object
-        self.sprite = GameSprite(self.image, self.rect)
- 
-    def create_enemy(self, x, y):
-        if(self.enemy_count > 0):
-            self.enemy_surface = self.sprite.getImage()
-            self.enemy_list.append(Enemy(self.enemy_surface, x, y))
-            self.enemy_count -= 1
- 
-    def update(self):
-        if (self.more_enemy > 600):
-            self.more_enemy = 0
-            x = random.randint(30, self.boundary_width - 50)
-            self.create_enemy(x , self.y)  # create more enemy
-        else:
-            self.more_enemy += 1 # increase time
- 
-        self.enemy_update()
-        self.check_boundary()
- 
-    def enemy_update(self):
- 
-        for item in list(self.enemy_list):
-            if(item.on == False):
-                self.enemy_list.remove(item)
-                self.enemy_count += 1
-            else:
-                item.update()
- 
-    def check_boundary(self):
-        for i in range(len(self.enemy_list)):
-            if (self.enemy_list[i].y > self.boundary_height):
-                self.enemy_list[i].on = False
- 
-    def draw(self):
- 
-        # blit the enemy on  the scene
-        for i in range(len(self.enemy_list)):
-            self.scene.blit(self.enemy_list[i].enemy_surface, self.enemy_list[i].enemy_pos)
-
-        
-
+       
 
 session = Game()
 session.start()
