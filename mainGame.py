@@ -46,6 +46,7 @@ class Game:
         self.loadRoom(self.currentRoom)
         
         while not done:
+            
             self.screen.fill((0,0,0))
             if self.currentRoom != self.pastRoom:
                 self.loadRoom(self.currentRoom)
@@ -62,6 +63,7 @@ class Game:
                 if pressed[pygame.K_UP]:
                     if not self.checkEdges("up"):
                         self.character.move('up')
+                        self.mob.move(self.character)
                 if pressed[pygame.K_DOWN]:
                     if not self.checkEdges("down"):
                         self.character.move('down')
@@ -84,6 +86,7 @@ class Game:
             self.draw_bg(self.currentRoom.background)
             if not self.character.attacking:
                 self.character.draw(self.screen)
+                self.mob.draw(self.screen,True)
             else:
                 self.character.draw(self.screen,False,True)
             for door in self.existingdoors:
@@ -134,7 +137,7 @@ class Game:
         for door in Room.doorList:
             self.existingdoors.append(door)
         self.character.draw(self.screen,True)
-        self.mob.create_enemy(Game())
+        self.mob.draw(self.screen,True)
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
@@ -223,17 +226,35 @@ class Room:
         self.doorList = doorList
         self.background = background
 
-class Mob(pygame.sprite.Sprite):
+class Mob:
     def __init__(self):
+        self.orientation = 'right'
+        self.frame = 0
+        self.animation = pygame.transform.scale((pygame.image.load('Slime_Walk_1.png')), (120,120))
         self.move_right = [pygame.image.load("Slime_Walk_0.png"),pygame.image.load("Slime_Walk_1.png"),pygame.image.load("Slime_Walk_2.png"),pygame.image.load("Slime_Walk_3.png")]
         self.move_left = [pygame.image.load("Slime_Walk_0.png"),pygame.image.load("Slime_Walk_1.png"),pygame.image.load("Slime_Walk_2.png"),pygame.image.load("Slime_Walk_3.png")]
         self.health = 2
         self.image = pygame.image.load("Slime_Walk_1.png")
-        self.x = random.randint(1,800)
-        self.y = random.randint(1,800)
-    def create_enemy(self,Game):
-        Game.self.screen.blt(self.move_right[0],self.x,self.y)
-        pygame.display.flip
+        self.x = random.randint(1,400)
+        self.y = random.randint(1,400)
+        self.rect = self.animation.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+
+    def draw(self,screen, newScreen=False):
+        i = random.randint(0,3)
+        screen.blit(self.move_right[0],(self.x,self.y))
+        if newScreen == True:
+            self.rect.x = random.randint(1,400)
+            self.rect.y = random.randint(1,400)
+            screen.blit(pygame.transform.flip(self.move_right[i],True,False),(self.rect.x,self.rect.y))
+    def move(self,character):
+        if self.rect.x > character.rect.x:
+            self.rect.x += 1
+            
+        
+
+        
         
        
 
