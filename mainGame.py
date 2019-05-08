@@ -365,8 +365,6 @@ class Defence_up(Item):
     def __init__(self):
         super().__init__("shield0.png")
 
-
-        
         
         
 
