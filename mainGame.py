@@ -1,6 +1,6 @@
 import pygame
 import time
-from random import choice
+from random import choice, randint
 
 WIDTH = 800
 HEIGHT = 800
@@ -18,9 +18,10 @@ class Game:
         self.character = Hero()
         self.existingdoors = []
         self.existingwalls = []
+        self.existingItems = []
         image1 = pygame.image.load('dunegon.png')
         # Door pattern: left right up down
-        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,120)], [Wall(100,100,100,100)], image1)
+        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(300,300)], [], image1)
         self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
         self.room3 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
         self.room4 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
@@ -30,6 +31,7 @@ class Game:
         self.room8 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
         self.room9 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
         self.room10 = Room([LockedDoor(35,360), Door(700,360)], [], image1)
+        self.hiddenRoom = HiddenRoom([],[],image1)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
         self.currentRoom = choice(self.roomList)
         self.exploredRoomList = []
@@ -86,9 +88,23 @@ class Game:
                 self.character.draw(self.screen,False,True)
             for door in self.existingdoors:
                 door.draw(self.screen)
+            for item in self.existingItems:
+                item.draw(self.screen)
             pygame.display.flip()
 
-            if self.checkDoors() == True:
+            if self.checkItems() == True:
+                if self.existingItems[0].__class__.__name__ == "Defense_up":
+                    self.character.defense += 1
+                elif self.existingItems[0].__class__.__name__ == "Speed_up":
+                    self.character.speed += 1
+                else:
+                    self.character.health += 1
+                print(self.character.health,self.character.defense,self.character.speed)
+                self.existingItems = []
+                self.loadRoom(self.room1)
+                
+
+            if self.checkDoors() != "HiddenDoor" and self.checkDoors() != "None":
                 newRoomLoop = True
                 while newRoomLoop:
                     room = choice(self.roomList)
@@ -97,15 +113,25 @@ class Game:
                             pass
                         self.currentRoom = room
                         newRoomLoop = False
+            elif self.checkDoors() == "HiddenDoor":
+                self.loadRoom(self.hiddenRoom)
             pygame.display.update()
             self.clock.tick(60)
+
+    def checkItems(self):
+        for item in self.existingItems:
+            if self.character.rect.colliderect(item.rect):
+                return True
+        return False
 
     def checkDoors(self):
         for door in self.existingdoors:
             if self.character.rect.colliderect(door.rect):
                 if door.__class__.__name__ != "LockedDoor": # https://stackoverflow.com/questions/45667541/how-to-compare-to-type-of-custom-class
-                    return True
-        return False
+                    return str(door.__class__.__name__)
+                if door.__class__.__name__ == "HiddenDoor":
+                    return "HiddenDoor"
+        return "None"
 
     def checkWalls(self,direction):
         for wall in self.existingwalls:
@@ -162,6 +188,20 @@ class Game:
         for wall in Room.wallList:
             self.existingwalls.append(wall)
         self.character.draw(self.screen,True)
+        print(Room.__class__.__name__)
+        if Room.__class__.__name__ == "HiddenRoom":
+            self.generateItem()
+
+    def generateItem(self):
+        choice = randint(1,3)
+        if choice == 1:
+            item = Health_up()
+        elif choice == 2:
+            item = Defence_up()
+        else:
+            item = Speed_up()
+        self.existingItems.append(item)
+
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
@@ -198,7 +238,6 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
-            # self.screen.blit(self.bg,(0,0))
             self.screen.fill((0,0,0))
             textrect = self.text.get_rect()
             textrect.center = (WIDTH//2,300)
@@ -210,6 +249,9 @@ class Game:
             self.clock.tick(60)
 class Hero:
     def __init__(self):
+        self.health = 3
+        self.defense = 0
+        self.speed = 0
         self.frame = 0
         self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00.png')), (120,120))
         self.orientation = "right"
@@ -291,12 +333,39 @@ class Room:
         self.wallList = wallList
         self.background = background
 
+class HiddenRoom(Room):
+    def __init__(self,doorList,wallList,background):
+        super().__init__(doorList,wallList,background)
+
 class Wall:
     def __init__(self,spawnx,spawny,lenx,leny):
         self.rect = pygame.Rect(spawnx,spawny,spawnx+lenx,spawny+leny)
 
     def draw(self):
         pass
+
+class Item:
+    def __init__(self,sprite):
+        self.sprite = pygame.image.load(f'{sprite}')
+        self.rect = self.sprite.get_rect()
+        self.rect.x,self.rect.y = 250,400
+
+    def draw(self,screen):
+        screen.blit(self.sprite,(self.rect.x,self.rect.y))
+
+class Health_up(Item):
+    def __init__(self):
+        super().__init__("HP_3.png")
+
+class Speed_up(Item):
+    def __init__(self):
+        super().__init__("speed.png")
+
+class Defence_up(Item):
+    def __init__(self):
+        super().__init__("shield0.png")
+
+
         
         
         
