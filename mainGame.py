@@ -22,7 +22,7 @@ class Game:
         self.existingdoors = []
         self.existingwalls = []
         self.existingItems = []
-        self.mob = Mob(100,410,64,64,300)
+        self.mob = Enemy(100,410,64,64,600)
         self.character = Hero()
         self.existingdoors = []
         
@@ -72,7 +72,6 @@ class Game:
                 if pressed[pygame.K_UP]:
                     if not self.checkEdges("up") and not self.checkWalls("up"):
                         self.character.move('up')
-                        self.mob.move(self.character)
                 if pressed[pygame.K_DOWN]:
                     if not self.checkEdges("down") and not self.checkWalls("down"):
                         self.character.move('down')
@@ -95,7 +94,7 @@ class Game:
             self.draw_bg(self.currentRoom.background)
             if not self.character.attacking:
                 self.character.draw(self.screen)
-                self.mob.draw(self.screen,True)
+                self.mob.draw(self.screen)
             else:
                 self.character.draw(self.screen,False,True)
             for door in self.existingdoors:
@@ -370,11 +369,13 @@ class Defence_up(Item):
     def __init__(self):
         super().__init__("shield0.png")
 
-class Mob:
-    walkright = [pygame.image.load('SLime_Walk_0.png'),pygame.image.load('SLime_Walk_1.png'),pygame.image.load('SLime_Walk_2.png'),pygame.image.load('SLime_Walk_3.png')]
+class Enemy:
+    walkright = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
+    walkleft = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
     def __init__(self,x,y,width,height,end):
         self.x = x
-        self.y = yieldself.width = width
+        self.y = y
+        self.width = width
         self.height = height 
         self.path = [x,end]
         self.walkcount = 0
@@ -388,11 +389,11 @@ class Mob:
             screen.blit(self.walkright[self.walkcount//3], (self.x,self.y))
             self.walkcount += 1
         else:
-            screen.blit(self.walkright[self.walkcount//3], (self.x,self.y))
+            screen.blit(pygame.transform.flip(self.walkleft[self.walkcount//3],True,False), (self.x,self.y))
             self.walkcount += 1
     def move(self):
         if self.vel > 0:
-            if self.x < self.paht[1] + self.vel:
+            if self.x < self.path[1] + self.vel:
                 self.x += self.vel
             else:
                 self.vel = self.vel * -1
