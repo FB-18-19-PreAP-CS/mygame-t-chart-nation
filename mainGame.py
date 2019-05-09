@@ -1,9 +1,12 @@
 import pygame
 import time
-from random import choice, randint
-
+from random import choice
+from pygame import math as mt
+from pygame.locals import *
+import random
 WIDTH = 800
 HEIGHT = 800
+RED = (255,0,0)
 
 class Game:
     def __init__(self):
@@ -19,6 +22,10 @@ class Game:
         self.existingdoors = []
         self.existingwalls = []
         self.existingItems = []
+        self.mob = Mob(100,410,64,64,300)
+        self.character = Hero()
+        self.existingdoors = []
+        
         image1 = pygame.image.load('dunegon.png')
         # Door pattern: left right up down
         self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(300,300)], [], image1)
@@ -46,11 +53,14 @@ class Game:
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
+        
         while not done:
+            
             self.screen.fill((0,0,0))
             if self.currentRoom != self.pastRoom:
                 self.loadRoom(self.currentRoom)
                 self.pastRoom = self.currentRoom
+                
             if self.currentRoom not in self.exploredRoomList:
                 self.exploredRoomList.append(self.currentRoom)
             for event in pygame.event.get():
@@ -62,6 +72,7 @@ class Game:
                 if pressed[pygame.K_UP]:
                     if not self.checkEdges("up") and not self.checkWalls("up"):
                         self.character.move('up')
+                        self.mob.move(self.character)
                 if pressed[pygame.K_DOWN]:
                     if not self.checkEdges("down") and not self.checkWalls("down"):
                         self.character.move('down')
@@ -84,6 +95,7 @@ class Game:
             self.draw_bg(self.currentRoom.background)
             if not self.character.attacking:
                 self.character.draw(self.screen)
+                self.mob.draw(self.screen,True)
             else:
                 self.character.draw(self.screen,False,True)
             for door in self.existingdoors:
@@ -188,23 +200,12 @@ class Game:
         for wall in Room.wallList:
             self.existingwalls.append(wall)
         self.character.draw(self.screen,True)
-        print(Room.__class__.__name__)
-        if Room.__class__.__name__ == "HiddenRoom":
-            self.generateItem()
-
-    def generateItem(self):
-        choice = randint(1,3)
-        if choice == 1:
-            item = Health_up()
-        elif choice == 2:
-            item = Defence_up()
-        else:
-            item = Speed_up()
-        self.existingItems.append(item)
-
+        self.mob.draw(self.screen)
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
+    
+        
 
     def text_objects(self,text, font):
         textsurface = font.render(text, True, (255,255,255))
@@ -254,6 +255,7 @@ class Hero:
         self.speed = 0
         self.frame = 0
         self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00.png')), (120,120))
+        self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00 (1).png')), (120,120))
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
@@ -263,6 +265,9 @@ class Hero:
             self.moveRight.append(pygame.transform.scale(pygame.image.load(f'adventurer-run-0{i}.png'), (120,120)))
         for i in range(6):
             self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'adventurer-attack2-0{i}.png'), (120,120)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'adventurer-run-0{i} (1).png'), (120,120)))
+        for i in range(6):
+            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'adventurer-attack2-0{i} (1).png'), (120,120)))
         self.rect = self.animation.get_rect()
         self.rect.x = 100
         self.rect.y = 310
@@ -365,7 +370,42 @@ class Defence_up(Item):
     def __init__(self):
         super().__init__("shield0.png")
 
-        
+class Mob:
+    walkright = [pygame.image.load('SLime_Walk_0.png'),pygame.image.load('SLime_Walk_1.png'),pygame.image.load('SLime_Walk_2.png'),pygame.image.load('SLime_Walk_3.png')]
+    def __init__(self,x,y,width,height,end):
+        self.x = x
+        self.y = yieldself.width = width
+        self.height = height 
+        self.path = [x,end]
+        self.walkcount = 0
+        self.vel = 3
+
+    def draw(self,screen):
+        self.move()
+        if self.walkcount + 1 >= 12:
+            self.walkcount = 0
+        if self.vel > 0:
+            screen.blit(self.walkright[self.walkcount//3], (self.x,self.y))
+            self.walkcount += 1
+        else:
+            screen.blit(self.walkright[self.walkcount//3], (self.x,self.y))
+            self.walkcount += 1
+    def move(self):
+        if self.vel > 0:
+            if self.x < self.paht[1] + self.vel:
+                self.x += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.x += self.vel
+                self.walkcount = 0
+        else:
+            if self.x > self.path[0] - self.vel:
+                self.x += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.x += self.vel
+                self.walkcount = 0
+
         
 
 session = Game()
