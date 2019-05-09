@@ -17,7 +17,7 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
-        self.mob = Mob()
+        self.mob = Slime1(10)
         self.character = Hero()
         self.existingdoors = []
         
@@ -63,19 +63,24 @@ class Game:
                 if pressed[pygame.K_UP]:
                     if not self.checkEdges("up"):
                         self.character.move('up')
-                        self.mob.move(self.character)
+                        self.mob.follow(self.character)
                 if pressed[pygame.K_DOWN]:
                     if not self.checkEdges("down"):
                         self.character.move('down')
+                        self.mob.follow(self.character)
                 if pressed[pygame.K_LEFT]:
                     if not self.checkEdges("left"):
                         self.character.move('left')
+                        self.mob.follow(self.character)
                 if pressed[pygame.K_RIGHT]:
                     if not self.checkEdges("right"):
                         self.character.move('right')
+                        self.mob.follow(self.character)
             if pressed[pygame.K_SPACE]:
                 self.character.attacking = True
                 self.character.attackAnimation = 0
+                self.mob.follow(self.character)
+
             if self.character.attackAnimation != -1:
                 self.character.attackAnimation += .25
                 self.character.attack(((int(self.character.attackAnimation)) % 7), self.screen)
@@ -86,9 +91,10 @@ class Game:
             self.draw_bg(self.currentRoom.background)
             if not self.character.attacking:
                 self.character.draw(self.screen)
-                self.mob.draw(self.screen,True)
+                self.mob.draw(self.screen)
             else:
                 self.character.draw(self.screen,False,True)
+                self.mob.draw(self.screen)
             for door in self.existingdoors:
                 door.draw(self.screen)
             pygame.display.flip()
@@ -137,7 +143,7 @@ class Game:
         for door in Room.doorList:
             self.existingdoors.append(door)
         self.character.draw(self.screen,True)
-        self.mob.draw(self.screen,True)
+        self.mob.draw(self.screen)
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
@@ -225,37 +231,80 @@ class Room:
     def __init__(self, doorList, background):
         self.doorList = doorList
         self.background = background
-
-class Mob:
-    def __init__(self):
-        self.orientation = 'right'
-        self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('Slime_Walk_1.png')), (120,120))
-        self.move_right = [pygame.image.load("Slime_Walk_0.png"),pygame.image.load("Slime_Walk_1.png"),pygame.image.load("Slime_Walk_2.png"),pygame.image.load("Slime_Walk_3.png")]
-        self.move_left = [pygame.image.load("Slime_Walk_0.png"),pygame.image.load("Slime_Walk_1.png"),pygame.image.load("Slime_Walk_2.png"),pygame.image.load("Slime_Walk_3.png")]
-        self.health = 2
-        self.image = pygame.image.load("Slime_Walk_1.png")
-        self.x = random.randint(1,400)
-        self.y = random.randint(1,400)
-        self.rect = self.animation.get_rect()
-        self.rect.x = 0
-        self.rect.y = 0
-
-    def draw(self,screen, newScreen=False):
-        i = random.randint(0,3)
-        screen.blit(self.move_right[0],(self.x,self.y))
-        if newScreen == True:
-            self.rect.x = random.randint(1,400)
-            self.rect.y = random.randint(1,400)
-            screen.blit(pygame.transform.flip(self.move_right[i],True,False),(self.rect.x,self.rect.y))
-    def move(self,character):
-        if self.rect.x > character.rect.x:
-            self.rect.x += 1
             
         
 
         
-        
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self,health,strength,sprite,frames,pos):
+        pygame.sprite.Sprite.__init__(self)
+        self.health=health
+        self.pos=pos
+        self.strength=strength
+        self.orientation = 'left'
+        # self.animation = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
+        self.animation = []
+        for i in range(4):
+            self.animation.append(pygame.image.load(f"Slime_Walk_{i}.png"))
+       
+        self.frame = 0 
+        self.rect = self.animation[0].get_rect()
+        self.rect.x = random.randint(0,400)
+        self.rect.y = random.randint(0,400)
+    def draw(self,screen):
+        f = int(self.frame)%4
+        if self.orientation == 'right':
+            screen.blit(self.animation[f],(self.rect.x,self.rect.y))
+        elif self.orientation == 'left':
+            screen.blit(pygame.transform.flip(self.animation[f],True,False),(self.rect.x,self.rect.y))
+    def check_dead(self):
+        if self.health==0:
+            pass
+    def move(self,horizontal,vertical):
+        if horizontal<0:
+            self.orientation='left'
+        if horizontal>0:
+            self.orientation='right'
+        self.rect.x+=horizontal
+        self.rect.y+=vertical   
+    def attack(self,power):
+        pass
+        #need to use attack animation and 
+        #when to deal damage
+class Slime1(Enemy):
+    def __init__(self,pos):
+        self.count=0
+        Enemy.__init__(self,10,1,'Slime_Walk',4,pos)
+    def follow(self,hero):
+        self.frame+=.2
+        self.count+=1
+        self.count%=41
+        hori='l'
+        if hero.rect.x>=self.rect.x:
+            hori='r'
+        vert='u'
+        if hero.rect.y>=self.rect.y:
+            vert='d'
+        if self.count%40==0:
+            for i in range(10):
+                if vert=='u' and hori=='l':
+                    Enemy.move(self,-3,-3)
+                elif vert=='d' and hori=='l':
+                    Enemy.move(self,-3,3)
+                elif vert=='d' and hori=='r':
+                    Enemy.move(self,3,3)
+                else:
+                    Enemy.move(self,3,-3)
+        elif self.count%10==0:
+            for i in range(10):
+                if vert=='u' and hori=='l':
+                    Enemy.move(self,-1,-1)
+                elif vert=='d' and hori=='l':
+                    Enemy.move(self,-1,1)
+                elif vert=='d' and hori=='r':
+                    Enemy.move(self,1,1)
+                else:
+                    Enemy.move(self,1,-1)
        
 
 session = Game()
