@@ -91,12 +91,10 @@ class Game:
             self.draw_bg(self.currentRoom.background)
             if not self.character.attacking:
                 self.character.draw(self.screen)
-                for i in range(num):
-                    self.mob.draw(self.screen)
+                self.mob.draw(self.screen)
             else:
                 self.character.draw(self.screen,False,True)
-                for i in range(num):
-                    self.mob.draw(self.screen)
+                self.mob.draw(self.screen)
             for door in self.existingdoors:
                 door.draw(self.screen)
             pygame.display.flip()
@@ -145,8 +143,7 @@ class Game:
         for door in Room.doorList:
             self.existingdoors.append(door)
         self.character.draw(self.screen,True)
-        for i in range(num):
-            self.mob.draw(self.screen)
+        self.mob.draw(self.screen)
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
