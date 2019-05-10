@@ -45,7 +45,7 @@ class Game:
         self.exploredRoomList.append(self.currentRoom)
         self.font = pygame.font.Font('freesansbold.ttf',32)
         self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
-        self.bg = pygame.image.load('adventurer-die-00.png')
+        self.endtext = self.font.render('Game Over!',True,(255,255,255),(0,0,0))
 
     def start(self):
         done = False
@@ -246,7 +246,6 @@ class Game:
             self.button("Quit!",500,400,100,50,(255,0,0),(200,0,0),self.quitgame)
 
             pygame.display.update()
-            self.clock.tick(60)
 class Hero:
     def __init__(self):
         self.health = 3
