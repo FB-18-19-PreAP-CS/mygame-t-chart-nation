@@ -21,6 +21,7 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
+        self.mobs = []
         self.character = Hero()
         self.existingdoors = []
         self.existingwalls = []
@@ -106,26 +107,36 @@ class Game:
                 if pressed[pygame.K_UP]:
                     if not self.checkEdges("up") and not self.checkWalls("up"):
                         self.character.move('up')
+                        for mob in self.mobs:
+                            mob.follow(self.character)
                     elif self.checkEdges("up") == True:
                         self.character.rect.y = EDGEYT
                 if pressed[pygame.K_DOWN]:
                     if not self.checkEdges("down") and not self.checkWalls("down"):
                         self.character.move('down')
+                        for mob in self.mobs:
+                            mob.follow(self.character)
                     elif self.checkEdges("down") == True:
                         self.character.rect.y = EDGEYB
                 if pressed[pygame.K_LEFT]:
                     if not self.checkEdges("left") and not self.checkWalls("left"):
                         self.character.move('left')
+                        for mob in self.mobs:
+                            mob.follow(self.character)
                     elif self.checkEdges("left") == True:
                         self.character.rect.x = EDGEXL
                 if pressed[pygame.K_RIGHT]:
                     if not self.checkEdges("right") and not self.checkWalls("right"):
                         self.character.move('right')
+                        for mob in self.mobs:
+                            mob.follow(self.character)
                     elif self.checkEdges("right") == True:
                         self.character.rect.x = EDGEXR
             if pressed[pygame.K_SPACE]:
                 self.character.attacking = True
                 self.character.attackAnimation = 0
+                for mob in self.mobs:
+                    mob.follow(self.character)
             if self.character.attackAnimation != -1:
                 self.character.attackAnimation += .25
                 self.character.attack(((int(self.character.attackAnimation)) % 7), self.screen)
@@ -138,6 +149,8 @@ class Game:
                 self.character.draw(self.screen)
             else:
                 self.character.draw(self.screen,False,True)
+            for mob in self.mobs:
+                mob.follow(self.character)
             for door in self.existingdoors:
                 door.draw(self.screen)
             for item in self.existingItems:
@@ -240,9 +253,14 @@ class Game:
         for wall in Room.wallList:
             self.existingwalls.append(wall)
         self.character.draw(self.screen,True)
+        # self.spawnEnemies()
         print(Room.__class__.__name__)
         if Room.__class__.__name__ == "HiddenRoom":
             self.generateItem()
+
+    def spawnEnemies(self, Room):
+        for i in range(Room.enemyNumber):
+            pass
 
     def generateItem(self):
         choice = randint(1,3)
@@ -313,6 +331,77 @@ class Hero:
     def attack(self, animation, screen):
         self.draw(screen,False,True)
 
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self,health,strength,sprite,frames):
+        pygame.sprite.Sprite.__init__(self)
+        self.health=health
+        self.strength=strength
+        self.orientation = 'left'
+        # self.animation = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
+        self.animation = []
+        for i in range(4):
+            self.animation.append(pygame.image.load(f"Slime_Walk_{i}.png"))
+       
+        self.frame = 0 
+        self.rect = self.animation[0].get_rect()
+        self.rect.x = randint(0,400)
+        self.rect.y = randint(0,400)
+    def draw(self,screen):
+        f = int(self.frame)%4
+        if self.orientation == 'right':
+            screen.blit(self.animation[f],(self.rect.x,self.rect.y))
+        elif self.orientation == 'left':
+            screen.blit(pygame.transform.flip(self.animation[f],True,False),(self.rect.x,self.rect.y))
+    def check_dead(self):
+        if self.health==0:
+            pass
+    def move(self,horizontal,vertical):
+        if horizontal<0:
+            self.orientation='left'
+        if horizontal>0:
+            self.orientation='right'
+        self.rect.x+=horizontal
+        self.rect.y+=vertical   
+    def attack(self,power):
+        pass
+        #need to use attack animation and 
+        #when to deal damage
+
+class Slime1(Enemy):
+    def __init__(self):
+        self.count=0
+        Enemy.__init__(self,10,1,'Slime_Walk',4)
+    def follow(self,hero):
+        self.frame+=.2
+        self.count+=1
+        self.count%=41
+        hori='l'
+        if hero.rect.x>=self.rect.x:
+            hori='r'
+        vert='u'
+        if hero.rect.y>=self.rect.y:
+            vert='d'
+        if self.count%40==0:
+            for i in range(10):
+                if vert=='u' and hori=='l':
+                    Enemy.move(self,-3,-3)
+                elif vert=='d' and hori=='l':
+                    Enemy.move(self,-3,3)
+                elif vert=='d' and hori=='r':
+                    Enemy.move(self,3,3)
+                else:
+                    Enemy.move(self,3,-3)
+        elif self.count%10==0:
+            for i in range(10):
+                if vert=='u' and hori=='l':
+                    Enemy.move(self,-1,-1)
+                elif vert=='d' and hori=='l':
+                    Enemy.move(self,-1,1)
+                elif vert=='d' and hori=='r':
+                    Enemy.move(self,1,1)
+                else:
+                    Enemy.move(self,1,-1)
+
 
 
 class Door:
@@ -339,14 +428,15 @@ class HiddenDoor(Door):
         pass
   
 class Room:
-    def __init__(self, doorList, wallList, background):
+    def __init__(self, doorList, wallList, background, enemyNumber):
         self.doorList = doorList
         self.wallList = wallList
         self.background = background
+        self.enemyNumber = enemyNumber
 
 class HiddenRoom(Room):
-    def __init__(self,doorList,wallList,background):
-        super().__init__(doorList,wallList,background)
+    def __init__(self,doorList,wallList,background,enemyNumber):
+        super().__init__(doorList,wallList,background,enemyNumber)
 
 class Wall:
     def __init__(self,spawnx,spawny,lenx,leny):
