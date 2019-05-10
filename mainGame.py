@@ -7,7 +7,7 @@ import random
 WIDTH = 800
 HEIGHT = 800
 RED = (255,0,0)
-
+num = random.randint(0,4)
 class Game:
     def __init__(self):
         pygame.mixer.pre_init(48000,-16,2,2048)
@@ -17,7 +17,7 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
-        self.mob = Slime1(10)
+        self.mob = Slime1()
         self.character = Hero()
         self.existingdoors = []
         
@@ -91,10 +91,12 @@ class Game:
             self.draw_bg(self.currentRoom.background)
             if not self.character.attacking:
                 self.character.draw(self.screen)
-                self.mob.draw(self.screen)
+                for i in range(num):
+                    self.mob.draw(self.screen)
             else:
                 self.character.draw(self.screen,False,True)
-                self.mob.draw(self.screen)
+                for i in range(num):
+                    self.mob.draw(self.screen)
             for door in self.existingdoors:
                 door.draw(self.screen)
             pygame.display.flip()
@@ -143,7 +145,8 @@ class Game:
         for door in Room.doorList:
             self.existingdoors.append(door)
         self.character.draw(self.screen,True)
-        self.mob.draw(self.screen)
+        for i in range(num):
+            self.mob.draw(self.screen)
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
@@ -236,10 +239,9 @@ class Room:
 
         
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self,health,strength,sprite,frames,pos):
+    def __init__(self,health,strength,sprite,frames):
         pygame.sprite.Sprite.__init__(self)
         self.health=health
-        self.pos=pos
         self.strength=strength
         self.orientation = 'left'
         # self.animation = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
@@ -272,9 +274,9 @@ class Enemy(pygame.sprite.Sprite):
         #need to use attack animation and 
         #when to deal damage
 class Slime1(Enemy):
-    def __init__(self,pos):
+    def __init__(self):
         self.count=0
-        Enemy.__init__(self,10,1,'Slime_Walk',4,pos)
+        Enemy.__init__(self,10,1,'Slime_Walk',4)
     def follow(self,hero):
         self.frame+=.2
         self.count+=1
