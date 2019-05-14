@@ -8,6 +8,11 @@ WIDTH = 800
 HEIGHT = 800
 RED = (255,0,0)
 num = randint(0,4)
+EDGEXL = 85
+EDGEXR = WIDTH - 170
+EDGEYT = 85
+EDGEYB = HEIGHT - 200
+
 class Game:
     def __init__(self):
         pygame.mixer.pre_init(48000,-16,2,2048)
@@ -16,6 +21,7 @@ class Game:
         self.existingItems = []
         self.existingwalls = []
         self.hiddenroom =[]
+        self.mobs = []
         self.enemy = Enemys(100,420,32,32,600)
 
         self.font = pygame.font.Font('freesansbold.ttf',32)
@@ -153,13 +159,15 @@ class Game:
                 item.draw(self.screen)
             pygame.display.flip()
 
+            self.checkEnemies()
+
             if self.checkItems() == True:
                 if self.existingItems[0].__class__.__name__ == "Defense_up":
                     self.character.defense += 1
                 elif self.existingItems[0].__class__.__name__ == "Speed_up":
                     self.character.speed += 1
                 else:
-                    self.character.health += 1
+                    self.character.health += 75
                 print(self.character.health,self.character.defense,self.character.speed)
                 self.existingItems = []
                 self.loadRoom(self.room1)
@@ -184,6 +192,16 @@ class Game:
             if self.character.rect.colliderect(item.rect):
                 return True
         return False
+
+    def checkEnemies(self,attacking=False):
+        for mob in self.mobs:
+            if self.character.rect.colliderect(mob.rect):
+                if not attacking:
+                    self.character.health -= (1 - float(1/4 * self.character.defense))
+                    if self.character.health == 0:
+                        print("You Suck") #Game Over
+                else:
+                    self.mobs.remove(mob)
 
     def checkDoors(self):
         for door in self.existingdoors:
@@ -259,7 +277,7 @@ class Game:
 
 class Hero:
     def __init__(self):
-        self.health = 3
+        self.health = 200
         self.defense = 0
         self.speed = 0
         self.frame = 0
@@ -325,8 +343,8 @@ class Enemy(pygame.sprite.Sprite):
        
         self.frame = 0 
         self.rect = self.animation[0].get_rect()
-        self.rect.x = randint(0,400)
-        self.rect.y = randint(0,400)
+        self.rect.x = randint(400,EDGEXR)
+        self.rect.y = randint(100,EDGEYB)
     def draw(self,screen):
         f = int(self.frame)%4
         if self.orientation == 'right':
@@ -353,7 +371,7 @@ class Slime1(Enemy):
         self.count=0
         Enemy.__init__(self,10,1,'Slime_Walk',4)
     def follow(self,hero):
-        self.frame+=.2
+        self.frame+=.1
         self.count+=1
         self.count%=41
         hori='l'
@@ -362,18 +380,8 @@ class Slime1(Enemy):
         vert='u'
         if hero.rect.y>=self.rect.y:
             vert='d'
-        if self.count%40==0:
-            for i in range(10):
-                if vert=='u' and hori=='l':
-                    Enemy.move(self,-3,-3)
-                elif vert=='d' and hori=='l':
-                    Enemy.move(self,-3,3)
-                elif vert=='d' and hori=='r':
-                    Enemy.move(self,3,3)
-                else:
-                    Enemy.move(self,3,-3)
-        elif self.count%10==0:
-            for i in range(10):
+        if self.count%10==0:
+            for i in range(13):
                 if vert=='u' and hori=='l':
                     Enemy.move(self,-1,-1)
                 elif vert=='d' and hori=='l':
