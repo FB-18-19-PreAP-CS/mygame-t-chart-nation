@@ -1,13 +1,9 @@
 import pygame
 import time
-from random import choice
-from pygame import math as mt
-from pygame.locals import *
-from random import *
+from random import choice, randint
+
 WIDTH = 800
 HEIGHT = 800
-RED = (255,0,0)
-num = randint(0,4)
 EDGEXL = 85
 EDGEXR = WIDTH - 170
 EDGEYT = 85
@@ -18,34 +14,30 @@ class Game:
         pygame.mixer.pre_init(48000,-16,2,2048)
         pygame.mixer.init()
         pygame.init()
-        self.existingItems = []
-        self.existingwalls = []
-        self.hiddenroom =[]
-        self.mobs = []
         self.enemy = Enemys(100,420,32,32,600)
-
         self.font = pygame.font.Font('freesansbold.ttf',32)
         self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
 
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
-        self.mob = Slime1()
+        self.mobs = []
         self.character = Hero()
         self.existingdoors = []
-        
+        self.existingwalls = []
+        self.existingItems = []
         image1 = pygame.image.load('dunegon.png')
-        # Door pattern: left right up down
-        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,120)],[], image1,1)
-        self.room2 = Room([LockedDoor(35,360), Door(700,360)],[],image1,2)
-        self.room3 = Room([LockedDoor(35,360), Door(700,360)],[],image1,3)
-        self.room4 = Room([LockedDoor(35,360), Door(700,360)],[], image1,4)
-        self.room5 = Room([LockedDoor(35,360), Door(700,360)],[], image1,5)
-        self.room6 = Room([LockedDoor(35,360), Door(700,360)],[], image1,6)
-        self.room7 = Room([LockedDoor(35,360), Door(700,360)],[], image1,1)
-        self.room8 = Room([LockedDoor(35,360), Door(700,360)],[], image1,3)
-        self.room9 = Room([LockedDoor(35,360), Door(700,360)],[], image1,5)
-        self.room10 = Room([LockedDoor(35,360), Door(700,360)],[], image1,2)
+        self.room1 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3) # HiddenDoor(300,300)
+        self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.room3 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.room4 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.room5 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.room6 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.room7 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.room8 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.room9 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.room10 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
+        self.hiddenRoom = HiddenRoom([Door(700,360)],[],image1, 3)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
         self.currentRoom = self.room1 #choice(self.roomList)
         self.exploredRoomList = []
@@ -99,14 +91,11 @@ class Game:
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
-        
         while not done:
-            
             self.screen.fill((0,0,0))
             if self.currentRoom != self.pastRoom:
                 self.loadRoom(self.currentRoom)
                 self.pastRoom = self.currentRoom
-                
             if self.currentRoom not in self.exploredRoomList:
                 self.exploredRoomList.append(self.currentRoom)
             for event in pygame.event.get():
@@ -118,25 +107,38 @@ class Game:
                 if pressed[pygame.K_UP]:
                     if not self.checkEdges("up") and not self.checkWalls("up"):
                         self.character.move('up')
-                        self.mob.follow(self.character)
+                        for mob in self.mobs:
+                            mob.follow(self.character)
+                    elif self.checkEdges("up") == True:
+                        self.character.rect.y = EDGEYT
                 if pressed[pygame.K_DOWN]:
                     if not self.checkEdges("down") and not self.checkWalls("down"):
                         self.character.move('down')
-                        self.mob.follow(self.character)
+                        for mob in self.mobs:
+                            mob.follow(self.character)
+                    elif self.checkEdges("down") == True:
+                        self.character.rect.y = EDGEYB
                 if pressed[pygame.K_LEFT]:
                     if not self.checkEdges("left") and not self.checkWalls("left"):
                         self.character.move('left')
-                        self.mob.follow(self.character)
+                        for mob in self.mobs:
+                            mob.follow(self.character)
+                    elif self.checkEdges("left") == True:
+                        self.character.rect.x = EDGEXL
                 if pressed[pygame.K_RIGHT]:
                     if not self.checkEdges("right") and not self.checkWalls("right"):
                         self.character.move('right')
-                        self.mob.follow(self.character)
-            if pressed[pygame.K_SPACE]:
-                self.character.attacking = True
-                self.character.attackAnimation = 0
-                self.mob.follow(self.character)
-                self.mob.draw(self.screen)
-
+                        for mob in self.mobs:
+                            mob.follow(self.character)
+                    elif self.checkEdges("right") == True:
+                        self.character.rect.x = EDGEXR
+                if pressed[pygame.K_SPACE]:
+                    self.character.attacking = True
+                    self.character.attackAnimation = 0
+                    for mob in self.mobs:
+                        mob.follow(self.character)
+            else:
+                self.checkEnemies(True)
             if self.character.attackAnimation != -1:
                 self.character.attackAnimation += .25
                 self.character.attack(((int(self.character.attackAnimation)) % 7), self.screen)
@@ -147,12 +149,13 @@ class Game:
             self.draw_bg(self.currentRoom.background)
             if not self.character.attacking:
                 self.character.draw(self.screen)
-                self.mob.draw(self.screen)
                 self.enemy.draw(self.screen)
             else:
                 self.character.draw(self.screen,False,True)
-                self.mob.draw(self.screen)
                 self.enemy.draw(self.screen)
+            for mob in self.mobs:
+                mob.follow(self.character)
+                mob.draw(self.screen)
             for door in self.existingdoors:
                 door.draw(self.screen)
             for item in self.existingItems:
@@ -261,19 +264,38 @@ class Game:
     def loadRoom(self, Room):
         time.sleep(2)
         self.draw_bg(Room.background)
+        self.enemy.draw(self.screen)
         self.existingdoors = []
         for door in Room.doorList:
             self.existingdoors.append(door)
         for wall in Room.wallList:
             self.existingwalls.append(wall)
         self.character.draw(self.screen,True)
-        self.mob.draw(self.screen)
-        self.enemy.draw(self.screen)
+        self.mobs = []
+        for enemy in range(Room.enemyNumber):
+            self.spawnEnemy()
+        print(Room.__class__.__name__)
+        if Room.__class__.__name__ == "HiddenRoom":
+            self.generateItem()
+
+    def spawnEnemy(self):
+        enemy = Slime1()
+        self.mobs.append(enemy)
+        enemy.draw(self.screen)
+
+    def generateItem(self):
+        choice = randint(1,3)
+        if choice == 1:
+            item = Health_up()
+        elif choice == 2:
+            item = Defence_up()
+        else:
+            item = Speed_up()
+        self.existingItems.append(item)
+
 
     def draw_bg(self, image):
         self.screen.blit(pygame.transform.scale(image, (800,800)),(0,0))
-    
-        
 
 class Hero:
     def __init__(self):
@@ -281,17 +303,17 @@ class Hero:
         self.defense = 0
         self.speed = 0
         self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00 (1).png')), (120,120))
+        self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00 (1).png')), (80,80))
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
         self.attackAnimation = -1
         self.attacking = False
         for i in range(6):
-            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'adventurer-run-0{i} (1).png'), (120,120)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'adventurer-run-0{i} (1).png'), (80,80)))
         for i in range(6):
-            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'adventurer-attack2-0{i} (1).png'), (120,120)))
-        self.rect = self.animation.get_rect()
+            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'adventurer-attack2-0{i} (1).png'), (80,80)))
+        self.rect = pygame.Rect(0,0,80,80)
         self.rect.x = 100
         self.rect.y = 310
 
@@ -421,80 +443,40 @@ class Room:
         self.doorList = doorList
         self.wallList = wallList
         self.background = background
-            
-        
+        self.enemyNumber = enemyNumber
 
-        
-class Enemys(pygame.sprite.Sprite):
-    def __init__(self,health,strength,sprite,frames):
-        pygame.sprite.Sprite.__init__(self)
-        self.health=health
-        self.strength=strength
-        self.orientation = 'left'
-        # self.animation = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
-        self.animation = []
-        for i in range(4):
-            self.animation.append(pygame.image.load(f"Slime_Walk_{i}.png"))
-       
-        self.frame = 0 
-        self.rect = self.animation[0].get_rect()
-        self.rect.x = randint(0,400)
-        self.rect.y = randint(0,400)
-    def draw(self,screen):
-        f = int(self.frame)%4
-        if self.orientation == 'right':
-            screen.blit(self.animation[f],(self.rect.x,self.rect.y))
-        elif self.orientation == 'left':
-            screen.blit(pygame.transform.flip(self.animation[f],True,False),(self.rect.x,self.rect.y))
-    def check_dead(self):
-        if self.health==0:
-            pass
-    def move(self,horizontal,vertical):
-        if horizontal<0:
-            self.orientation='left'
-        if horizontal>0:
-            self.orientation='right'
-        self.rect.x+=horizontal
-        self.rect.y+=vertical   
-    def attack(self,power):
+class HiddenRoom(Room):
+    def __init__(self,doorList,wallList,background,enemyNumber):
+        super().__init__(doorList,wallList,background,enemyNumber)
+
+class Wall:
+    def __init__(self,spawnx,spawny,lenx,leny):
+        self.rect = pygame.Rect(spawnx,spawny,spawnx+lenx,spawny+leny)
+
+    def draw(self):
         pass
-        #need to use attack animation and 
-        #when to deal damage
-class Slime1(Enemy):
+
+class Item:
+    def __init__(self,sprite):
+        self.sprite = pygame.transform.scale((pygame.image.load(f'{sprite}')), (25,25))
+        self.rect = self.sprite.get_rect()
+        self.rect.x,self.rect.y = 250,400
+
+    def draw(self,screen):
+        screen.blit(self.sprite,(self.rect.x,self.rect.y))
+
+class Health_up(Item):
     def __init__(self):
-        self.count=0
-        Enemy.__init__(self,10,1,'Slime_Walk',4)
-    def follow(self,hero):
-        self.frame+=.2
-        self.count+=1
-        self.count%=41
-        hori='l'
-        if hero.rect.x>=self.rect.x:
-            hori='r'
-        vert='u'
-        if hero.rect.y>=self.rect.y:
-            vert='d'
-        if self.count%40==0:
-            for i in range(10):
-                if vert=='u' and hori=='l':
-                    Enemy.move(self,-3,-3)
-                elif vert=='d' and hori=='l':
-                    Enemy.move(self,-3,3)
-                elif vert=='d' and hori=='r':
-                    Enemy.move(self,3,3)
-                else:
-                    Enemy.move(self,3,-3)
-        elif self.count%10==0:
-            for i in range(10):
-                if vert=='u' and hori=='l':
-                    Enemy.move(self,-1,-1)
-                elif vert=='d' and hori=='l':
-                    Enemy.move(self,-1,1)
-                elif vert=='d' and hori=='r':
-                    Enemy.move(self,1,1)
-                else:
-                    Enemy.move(self,1,-1)
-       
+        super().__init__("HP_3.png")
+
+class Speed_up(Item):
+    def __init__(self):
+        super().__init__("speed.png")
+
+class Defence_up(Item):
+    def __init__(self):
+        super().__init__("shield0.png")
+
 class Enemys:
     walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png')]
     walkleft = [pygame.image.load('Green_Slime_0.png'),pygame.image.load('Green_Slime_1.png'),pygame.image.load('Yellow_Slime_0.png'),pygame.image.load('Yellow_Slime_1.png')]
