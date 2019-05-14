@@ -488,8 +488,8 @@ class Slime1(Enemy):
                     Enemy.move(self,1,-1)
        
 class Enemys:
-    walkright = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
-    walkleft = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
+    walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png')]
+    walkleft = [pygame.image.load('Green_Slime_0.png'),pygame.image.load('Green_Slime_1.png'),pygame.image.load('Yellow_Slime_0.png'),pygame.image.load('Yellow_Slime_1.png')]
     def __init__(self,x,y,width,height,end):
         self.x = x
         self.y = y
