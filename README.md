@@ -6,7 +6,7 @@ your way to freedom from the depths of dunegon, the third largest dungeon in all
 Placeholder. Along the way meet a number of characters and enemies, starting with:
 
 ### j'0hn, The Hero
-![j'0hn](/images/adventurer-idle-00.png)
+![j'0hn](/images/adventurer-idle-00.png=400x296)
 This is info about J'0hn and controls.
 
 ### Silme
