@@ -29,6 +29,7 @@ class Game:
         self.existingdoors = []
         self.existingwalls = []
         self.existingItems = []
+        self.bg = pygame.image.load('dunegon.png')
         image1 = pygame.image.load('dunegon.png')
         self.room1 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3) # HiddenDoor(300,300)
         self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
@@ -390,6 +391,7 @@ class Game:
             self.screen.blit(self.text,textrect)
             self.button('GO!',200,400,100,50,(0,255,0),(0,200,0),self.start)
             self.button("Quit!",500,400,100,50,(255,0,0),(200,0,0),self.quitgame)
+            self.draw_bg(self, self.bg)
             pygame.display.update()
     
     def lose_screen(self):
