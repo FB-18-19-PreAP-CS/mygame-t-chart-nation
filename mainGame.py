@@ -14,7 +14,7 @@ class Game:
         pygame.mixer.pre_init(48000,-16,2,2048)
         pygame.mixer.init()
         pygame.init()
-        self.enemy = Enemys(100,420,32,32,600)
+        self.enemy = Enemys(400,100,650)
         self.font = pygame.font.Font('freesansbold.ttf',32)
         self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
 
@@ -478,13 +478,11 @@ class Defence_up(Item):
         super().__init__("shield0.png")
 
 class Enemys:
-    walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png')]
-    walkleft = [pygame.image.load('Green_Slime_0.png'),pygame.image.load('Green_Slime_1.png'),pygame.image.load('Yellow_Slime_0.png'),pygame.image.load('Yellow_Slime_1.png')]
+    walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png')]
+    walkleft = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png')]
     def __init__(self,x,y,width,height,end):
         self.x = x
         self.y = y
-        self.width = width
-        self.height = height 
         self.path = [x,end]
         self.walkcount = 0
         self.vel = 3
@@ -501,18 +499,18 @@ class Enemys:
             self.walkcount += 1
     def move(self):
         if self.vel > 0:
-            if self.x < self.path[1] + self.vel:
-                self.x += self.vel
+            if self.y < self.path[1] + self.vel:
+                self.y += self.vel
             else:
                 self.vel = self.vel * -1
-                self.x += self.vel
+                self.y += self.vel
                 self.walkcount = 0
         else:
-            if self.x > self.path[0] - self.vel:
-                self.x += self.vel
+            if self.y > self.path[0] - self.vel:
+                self.y += self.vel
             else:
                 self.vel = self.vel * -1
-                self.x += self.vel
+                self.y += self.vel
                 self.walkcount = 0
 
 session = Game()
