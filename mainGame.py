@@ -24,6 +24,7 @@ class Game:
         pygame.display.set_caption("Stalin")
         self.clock = pygame.time.Clock()
         self.mobs = []
+        self.mob = Enemys(100,420,64,64,650)
         self.character = Hero()
         self.existingdoors = []
         self.existingwalls = []
@@ -47,6 +48,7 @@ class Game:
         self.font = pygame.font.Font('freesansbold.ttf',32)
         self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
         self.endtext = self.font.render('Game Over!',True,(255,255,255),(0,0,0))
+        self.wintext = self.font.render('You Win!',True,(255,255,255),(0,0,0))
 
     def text_objects(self,text, font):
         textsurface = font.render(text, True, (255,255,255))
@@ -251,7 +253,7 @@ class Game:
                 if not attacking:
                     self.character.health -= (1 - float(1/4 * self.character.defense))
                     if self.character.health == 0:
-                        print("You Suck") #Game Over
+                        self.lose_screen() #Game Over
                 else:
                     self.mobs.remove(mob)
 
@@ -367,7 +369,10 @@ class Game:
         textsurf, textrect = self.text_objects(msg,smalltext)
         textrect.center = ( (x+(w/2)), (y+(h/2)) )
         self.screen.blit(textsurf, textrect)
-    
+    def begin(self):
+        session = Game()
+        session.game_intro()
+
     def quitgame(self):
         pygame.quit()
         quit()
@@ -387,14 +392,25 @@ class Game:
             self.button("Quit!",500,400,100,50,(255,0,0),(200,0,0),self.quitgame)
             pygame.display.update()
     
-    def lose_screen(self,screen):
-        screen.fill((0,0,0))
+    def lose_screen(self):
+        self.screen.fill((0,0,0))
         textrect = self.endtext.get_rect()
-        textrect = (WIDTH//2, 300)
+        textrect = (300, 350)
         self.screen.blit(self.endtext,textrect)
-        sleep(3)
-        self.quitgame()
-        self.start()
+        pygame.display.update()
+        time.sleep(2)
+        self.quitgame
+        self.begin()
+    
+    def win_screen(self):
+        self.screen.fill((0,0,0))
+        textrect = self.wintext.getrect()
+        textrect = (300,350)
+        self.screen.blit(self.endtext,textrect)
+        pygame.display.update()
+        time.sleep(2)
+        self.quitgame
+        self.begin()
 
         
 class Hero:
@@ -465,8 +481,8 @@ class Enemy(pygame.sprite.Sprite):
        
         self.frame = 0 
         self.rect = self.animation[0].get_rect()
-        self.rect.x = randint(400,EDGEXR)
-        self.rect.y = randint(100,EDGEYB)
+        self.rect.x = random.randint(400,EDGEXR)
+        self.rect.y = random.randint(100,EDGEYB)
     def draw(self,screen):
         f = int(self.frame)%4
         if self.orientation == 'right':
@@ -583,8 +599,6 @@ class Enemys:
     def __init__(self,x,y,width,height,end):
         self.x = x
         self.y = y
-        self.width = width
-        self.height = height 
         self.path = [x,end]
         self.walkcount = 0
         self.vel = 3
