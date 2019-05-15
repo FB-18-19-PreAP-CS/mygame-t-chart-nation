@@ -5,7 +5,8 @@ the dark lord Garblax. Be prepared to hack and slash through hordes of enemies o
 your way to freedom from the depths of dunegon, the third largest dungeon in all of 
 Placeholder. Along the way meet a number of characters and enemies, starting with:
 
-### j'0hn
+### j'0hn, The Hero
+![j'0hn](/images/adventurer-idle-00.png)
 This is info about J'0hn and controls.
 
 ### Silme
