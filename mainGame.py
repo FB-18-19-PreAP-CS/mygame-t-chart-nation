@@ -480,7 +480,7 @@ class Defence_up(Item):
 class Enemys:
     walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png')]
     walkleft = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png')]
-    def __init__(self,x,y,width,height,end):
+    def __init__(self,x,y,end):
         self.x = x
         self.y = y
         self.path = [x,end]
@@ -512,6 +512,7 @@ class Enemys:
                 self.vel = self.vel * -1
                 self.y += self.vel
                 self.walkcount = 0
+
 
 session = Game()
 session.start()
