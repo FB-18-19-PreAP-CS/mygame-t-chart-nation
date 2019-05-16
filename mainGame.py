@@ -386,16 +386,17 @@ class Game:
                     pygame.quit()
                     quit()
             self.screen.fill((0,0,0))
+            self.draw_bg(self.bg)
             textrect = self.text.get_rect()
             textrect.center = (WIDTH//2,300)
             self.screen.blit(self.text,textrect)
             self.button('GO!',200,400,100,50,(0,255,0),(0,200,0),self.start)
             self.button("Quit!",500,400,100,50,(255,0,0),(200,0,0),self.quitgame)
-            self.draw_bg(self, self.bg)
             pygame.display.update()
     
     def lose_screen(self):
         self.screen.fill((0,0,0))
+        self.draw_bg(self.bg)
         textrect = self.endtext.get_rect()
         textrect = (300, 350)
         self.screen.blit(self.endtext,textrect)
