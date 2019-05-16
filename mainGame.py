@@ -370,6 +370,7 @@ class Game:
         textsurf, textrect = self.text_objects(msg,smalltext)
         textrect.center = ( (x+(w/2)), (y+(h/2)) )
         self.screen.blit(textsurf, textrect)
+        
     def begin(self):
         session = Game()
         session.game_intro()
@@ -407,6 +408,7 @@ class Game:
     
     def win_screen(self):
         self.screen.fill((0,0,0))
+        self.draw_bg(self.bg)
         textrect = self.wintext.getrect()
         textrect = (300,350)
         self.screen.blit(self.endtext,textrect)
