@@ -602,6 +602,14 @@ class Speed_up(Item):
 class Defence_up(Item):
     def __init__(self):
         super().__init__("shield0.png")
+class HealthBar():
+    def __init__(self):
+        pass
+
+    def draw(self, health, screen):
+        pygame.draw.rect(screen, (255,0,0), (30,30,300,10))
+        pygame.draw.rect(screen, (0,0,0), (30+health,30,300-health,10))
+
 
 class Enemys:
     walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png')]
