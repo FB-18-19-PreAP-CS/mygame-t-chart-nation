@@ -31,19 +31,24 @@ class Game:
         self.existingItems = []
         image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
         self.bg = image1
-        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 75) # HiddenDoor(300,300)
+        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25) # HiddenDoor(300,300)
         self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
         self.room3 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room4 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
+        self.room4 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25)
         self.room5 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
         self.room6 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room7 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
+        self.room7 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25)
         self.room8 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
         self.room9 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room10 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
+        self.room10 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25)
+        self.room11 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
+        self.room12 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
+        self.room13 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25)
+        self.room14 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
+        self.room15 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
         self.hiddenRoom = HiddenRoom([Door(700,360)],[],image1, 3)
-        self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
-        self.currentRoom = self.room1 #choice(self.roomList)
+        self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10, self.room11, self.room12, self.room13, self.room14, self.room15]
+        self.currentRoom = choice(self.roomList)
         self.exploredRoomList = []
         self.exploredRoomList.append(self.currentRoom)
 
@@ -101,8 +106,9 @@ class Game:
         self.begin()
     
     def win_screen(self):
+        pygame.mixer.music.stop()
         self.screen.fill((0,0,0))
-        textrect = self.wintext.getrect()
+        textrect = self.wintext.get_rect()
         textrect = (300,350)
         self.screen.blit(self.endtext,textrect)
         pygame.display.update()
@@ -208,6 +214,7 @@ class Game:
                         self.character.health = 300
                 print(self.character.health,self.character.defense,self.character.speed)
                 self.existingItems = []
+                newRoomLoop = True
                 while newRoomLoop:
                     room = choice(self.roomList)
                     if room not in self.exploredRoomList or len(self.exploredRoomList) == len(self.roomList):
@@ -247,6 +254,7 @@ class Game:
                 if not attacking:
                     self.character.health -= (1/2 - float(1/16 * self.character.defense))
                     if self.character.health == 0:
+                        pygame.mixer.music.stop()
                         self.lose_screen()
                     return
                 else:
@@ -413,7 +421,6 @@ class Enemy(pygame.sprite.Sprite):
         self.health=health
         self.strength=strength
         self.orientation = 'left'
-        # self.animation = [pygame.image.load('Slime_Walk_0.png'),pygame.image.load('Slime_Walk_1.png'),pygame.image.load('Slime_Walk_2.png'),pygame.image.load('Slime_Walk_3.png')]
         self.animation = []
         for i in range(4):
             self.animation.append(pygame.image.load(f"Slime_Walk_{i}.png"))
@@ -535,6 +542,9 @@ class Slime1(Enemy):
 class Hydra(Slime1):
     def __init__(self):
         super().__init__()
+        self.animation = []
+        for i in range(4):
+            self.animation.append(pygame.image.load(f"Hydra_{i}.png"))
 
 
 
