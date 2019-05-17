@@ -45,3 +45,13 @@ Keep your eye out for these hidden powerups. These powerups come in three types:
 of durability, the lightning bolt of speed, and the health potion (of health). Search for 
 secret rooms containing these elusive powerups in order to make j'0hn stronger and more capable
 when fighting Garblox's army of slimes.
+
+
+
+
+Note: In order to avoid giving him power, Grablax's name has been misspelled in each time he is 
+mentioned.
+
+
+Image Sources:
+http://fishssticks.tumblr.com/post/160558029798/friend-i-think-hyperfixationspecial-interest - speed powerup
