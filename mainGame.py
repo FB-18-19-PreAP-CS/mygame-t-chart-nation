@@ -29,7 +29,6 @@ class Game:
         self.existingdoors = []
         self.existingwalls = []
         self.existingItems = []
-<<<<<<< HEAD
         image1 = pygame.image.load('dunegon.png')
         self.room1 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3) # HiddenDoor(300,300)
         self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
@@ -41,20 +40,6 @@ class Game:
         self.room8 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
         self.room9 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
         self.room10 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 3)
-=======
-        image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
-        self.bg = image1
-        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 75) # HiddenDoor(300,300)
-        self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room3 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room4 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room5 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room6 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room7 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room8 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room9 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room10 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
->>>>>>> master
         self.hiddenRoom = HiddenRoom([Door(700,360)],[],image1, 3)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
         self.currentRoom = self.room1 #choice(self.roomList)
@@ -618,7 +603,6 @@ class Defence_up(Item):
     def __init__(self):
         super().__init__("shield0.png")
 
-<<<<<<< HEAD
 class Enemys:
     walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png')]
     walkleft = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png')]
@@ -628,17 +612,6 @@ class Enemys:
         self.path = [x,end]
         self.walkcount = 0
         self.vel = 3
-=======
-class HealthBar():
-    def __init__(self):
-        pass
-
-    def draw(self, health, screen):
-        pygame.draw.rect(screen, (255,0,0), (30,30,300,10))
-        pygame.draw.rect(screen, (0,0,0), (30+health,30,300-health,10))
-
-        
->>>>>>> master
 
     def draw(self,screen):
         self.move()
