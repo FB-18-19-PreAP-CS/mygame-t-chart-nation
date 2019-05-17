@@ -52,6 +52,7 @@ class Game:
         self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
         self.endtext = self.font.render('Game Over!',True,(255,255,255),(0,0,0))
         self.wintext = self.font.render('You Win!',True,(255,255,255),(0,0,0))
+        self.clocktext = self.font.redner(self.clock,True,(255,255,255),(0,0,0))
 
     def text_objects(self,text, font):
         textsurface = font.render(text, True, (255,255,255))
@@ -465,7 +466,7 @@ class Game:
     def win_screen(self):
         self.screen.fill((0,0,0))
         self.draw_bg(self.bg)
-        textrect = self.wintext.getrect()
+        textrect = self.wintext.get_rect()
         textrect = (300,350)
         self.screen.blit(self.endtext,textrect)
         pygame.display.update()
@@ -473,7 +474,12 @@ class Game:
         self.quitgame
         self.begin()
 
-        
+    def timer(self):
+        self.clock.tick()
+        textrect = self.clocktext.get_rect()
+        textrect = (600,50)
+        self.screen.blit(self.clocktect,textrect)
+        pygame.display.update()
 class Hero:
     def __init__(self):
         self.health = 300
