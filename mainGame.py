@@ -49,11 +49,7 @@ class Game:
         self.room14 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
         self.room15 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
         self.hiddenRoom = HiddenRoom([Door(700,360)],[],image1, 3)
-<<<<<<< HEAD
-        self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10]
-=======
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10, self.room11, self.room12, self.room13, self.room14, self.room15]
->>>>>>> master
         self.currentRoom = choice(self.roomList)
         self.exploredRoomList = []
         self.exploredRoomList.append(self.currentRoom)
@@ -475,7 +471,7 @@ class Game:
         time.sleep(2)
         self.quitgame
         self.begin()
-    
+     
     def win_screen(self):
         self.screen.fill((0,0,0))
         self.draw_bg(self.bg)
@@ -587,19 +583,19 @@ class EnemyPath:
     def __init__(self):
         self.walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png')]
         self.walkleft = [pygame.image.load('Green_Slime_0.png'),pygame.image.load('Green_Slime_1.png'),pygame.image.load('Yellow_Slime_0.png'),pygame.image.load('Yellow_Slime_1.png')]
-        self.moveType = randint(1,2)
+        self.moveType = random.randint(1,2)
         if self.moveType == 1:
             self.moveType = "y"
         else:
             self.moveType = "x"
         self.rect = self.walkright[0].get_rect()
-        self.rect.x = randint(400,600)
-        self.rect.y = randint(100,400)
+        self.rect.x = random.randint(400,600)
+        self.rect.y = random.randint(100,400)
         if self.moveType == "x":
-            self.end = randint(600,EDGEXR)
+            self.end = random.randint(600,EDGEXR)
             self.path = [self.rect.x,self.end]
         else:
-            self.end = randint(400,EDGEYB)
+            self.end = random.randint(400,EDGEYB)
             self.path = [self.rect.y,self.end]
         self.walkcount = 0
         self.vel = 15
