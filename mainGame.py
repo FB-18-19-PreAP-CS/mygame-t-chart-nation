@@ -52,7 +52,8 @@ class Game:
         self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
         self.endtext = self.font.render('Game Over!',True,(255,255,255),(0,0,0))
         self.wintext = self.font.render('You Win!',True,(255,255,255),(0,0,0))
-        self.clocktext = self.font.redner(self.clock,True,(255,255,255),(0,0,0))
+        self.clock = str(self.clock)
+        self.clocktext = self.font.render(self.clock,True,(255,255,255),(0,0,0))
 
     def text_objects(self,text, font):
         textsurface = font.render(text, True, (255,255,255))
