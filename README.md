@@ -37,7 +37,7 @@ run into their path.
 
 <img src="Hydra_0.png" alt="drawing" width="296"/>
 
-Beware of the hydra, a special variety of slime which splits into two small silmes when
+Beware of the hydra, a special variety of slime which splits into two smaller silmes when
 killed. Perhaps the most dangerous of Gorblax's minions, these slimes have claimed many
 adventurers over time.
 
