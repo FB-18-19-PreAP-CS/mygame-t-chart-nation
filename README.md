@@ -64,3 +64,5 @@ http://fishssticks.tumblr.com/post/160558029798/friend-i-think-hyperfixationspec
 https://rvros.itch.io/animated-pixel-hero - hero
 
 https://opengameart.org/content/slime-2-frame-animation-32x32 - Tiny colored slimes
+
+https://uilleaggodwin.itch.io/roguelike-dungeon-asset-bundle - green 8-bit slimes, health pots
