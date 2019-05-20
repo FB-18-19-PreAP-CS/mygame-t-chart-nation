@@ -26,12 +26,16 @@ foe.
 
 ### Sliem
 
+<img src="Blue_Slime_0.png" alt="drawing" width="100"/> <img src="Green_Slime_0.png" alt="drawing" width="100"/> <img src="Red_Slime_0.png" alt="drawing" width="100"/> <img src="Yellow_Slime_0.png" alt="drawing" width="100"/>
+
 Unlike the silmes, these enemies won't try to follow you. Instead, they'll bounce back
 and forth waiting for you to run into them. Once again weak, these enemies will also die
 in one hit, but be careful, they're fast and can slowly leech away at your health if you
 run into their path.
 
 ### Hydra
+
+<img src="Hydra_0.png" alt="drawing" width="296"/>
 
 Beware of the hydra, a special variety of slime which splits into two small silmes when
 killed. Perhaps the most dangerous of Gorblax's minions, these slimes have claimed many
@@ -49,9 +53,10 @@ when fighting Garblox's army of slimes.
 
 
 
-Note: In order to avoid giving him power, Grablax's name has been misspelled in each time he is 
+Note: In order to avoid giving him power, Grablax's name has been misspelled each time he is 
 mentioned.
 
 
 Image Sources:
 http://fishssticks.tumblr.com/post/160558029798/friend-i-think-hyperfixationspecial-interest - speed powerup
+https://rvros.itch.io/animated-pixel-hero - hero
