@@ -69,3 +69,5 @@ https://opengameart.org/content/slime-2-frame-animation-32x32 - Tiny colored sli
 https://uilleaggodwin.itch.io/roguelike-dungeon-asset-bundle - Green/red 8-bit slimes, health pots
 
 http://pixelartmaker.com/art/cc9ed077aed46f5 - Shield
+
+Locked door sprite and dungeon inspiration from The Legend of Zelda
