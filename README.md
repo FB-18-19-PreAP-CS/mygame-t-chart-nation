@@ -13,7 +13,8 @@ Control j'0hn, our hero by using the arrow keys to traverse the various rooms. U
 space bar to make j'0hn swing his sword to tear through enemies on your way to escape,
 but don't let his health get too low. If you do, our hero will be defeated and the land
 will fall into darkness. Keep your eye out for hidden rooms, containing boosts to health,
-defense, and speed.
+defense, and speed. Try to get the highest score you can! Your score goes up for every enemy
+you kill, but the longer it takes for you to escape, the more your score goes down at the end.
 
 ### Silme
 
@@ -26,6 +27,8 @@ foe.
 
 ### Sliem
 
+<img src="Blue_Slime_0.png" alt="drawing" width="100"/> <img src="Green_Slime_0.png" alt="drawing" width="100"/> <img src="Red_Slime_0.png" alt="drawing" width="100"/> <img src="Yellow_Slime_0.png" alt="drawing" width="100"/>
+
 Unlike the silmes, these enemies won't try to follow you. Instead, they'll bounce back
 and forth waiting for you to run into them. Once again weak, these enemies will also die
 in one hit, but be careful, they're fast and can slowly leech away at your health if you
@@ -33,7 +36,9 @@ run into their path.
 
 ### Hydra
 
-Beware of the hydra, a special variety of slime which splits into two small silmes when
+<img src="Hydra_0.png" alt="drawing" width="296"/>
+
+Beware of the hydra, a special variety of slime which splits into two smaller silmes when
 killed. Perhaps the most dangerous of Gorblax's minions, these slimes have claimed many
 adventurers over time.
 
@@ -49,9 +54,18 @@ when fighting Garblox's army of slimes.
 
 
 
-Note: In order to avoid giving him power, Grablax's name has been misspelled in each time he is 
+Note: In order to avoid giving him power, Grablax's name has been misspelled each time he is 
 mentioned.
 
 
 Image Sources:
-http://fishssticks.tumblr.com/post/160558029798/friend-i-think-hyperfixationspecial-interest - speed powerup
+
+http://fishssticks.tumblr.com/post/160558029798/friend-i-think-hyperfixationspecial-interest - Speed powerup
+
+https://rvros.itch.io/animated-pixel-hero - Hero
+
+https://opengameart.org/content/slime-2-frame-animation-32x32 - Tiny colored slimes
+
+https://uilleaggodwin.itch.io/roguelike-dungeon-asset-bundle - Green/red 8-bit slimes, health pots
+
+http://pixelartmaker.com/art/cc9ed077aed46f5 - Shield
