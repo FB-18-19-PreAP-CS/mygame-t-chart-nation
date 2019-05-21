@@ -53,12 +53,11 @@ class Game:
         self.currentRoom = choice(self.roomList)
         self.exploredRoomList = []
         self.exploredRoomList.append(self.currentRoom)
+        self.mob = Slime1()
         self.font = pygame.font.Font('freesansbold.ttf',32)
         self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
         self.endtext = self.font.render('Game Over!',True,(255,255,255),(0,0,0))
         self.wintext = self.font.render('You Win!',True,(255,255,255),(0,0,0))
-        self.clock = str(self.clock)
-        self.clocktext = self.font.render(self.clock,True,(255,255,255),(0,0,0))
 
     def text_objects(self,text, font):
         textsurface = font.render(text, True, (255,255,255))
@@ -401,7 +400,7 @@ class Game:
         enemy.draw(self.screen)
 
     def generateItem(self):
-        choice = randint(1,3)
+        choice = random.randint(1,3)
         if choice == 1:
             item = Health_up()
         elif choice == 2:
@@ -483,12 +482,6 @@ class Game:
         self.quitgame
         self.begin()
 
-    def timer(self):
-        self.clock.tick()
-        textrect = self.clocktext.get_rect()
-        textrect = (600,50)
-        self.screen.blit(self.clocktect,textrect)
-        pygame.display.update()
 class Hero:
     def __init__(self):
         self.health = 300
