@@ -1,4 +1,4 @@
- # Dungeon Master: The Legend of j'0hn
+ # Dunegon Master: The Legend of j'0hn
 
 Help j'0hn, hero of the Land of Placeholder, escape the dungeon he's been trapped in by
 the dark lord Garblax, the slime master. Be prepared to hack and slash through hordes of
@@ -27,7 +27,7 @@ foe.
 
 ### Sliem
 
-<img src="Blue_Slime_0.png" alt="drawing" width="100"/> <img src="Green_Slime_0.png" alt="drawing" width="100"/> <img src="Red_Slime_0.png" alt="drawing" width="100"/> <img src="Yellow_Slime_0.png" alt="drawing" width="100"/>
+<img src="Blue_Slime_0.png" alt="drawing" width="200"/> 
 
 Unlike the silmes, these enemies won't try to follow you. Instead, they'll bounce back
 and forth waiting for you to run into them. Once again weak, these enemies will also die
@@ -51,7 +51,10 @@ of durability, the lightning bolt of speed, and the health potion (of health). S
 secret rooms containing these elusive powerups in order to make j'0hn stronger and more capable
 when fighting Garblox's army of slimes.
 
+## Screenshots
 
+<img src="Menu.png" alt="Menu screen" width="400"/> <img src="Screenshot_20190521_135506.png" alt="Average Room" width="400"/> 
+ <img src="Screenshot_20190521_140226.png" alt="Hidden Room" width="400"/> 
 
 
 Note: In order to avoid giving him power, Grablax's name has been misspelled each time he is 
