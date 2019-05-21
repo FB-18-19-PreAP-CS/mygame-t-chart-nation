@@ -13,7 +13,8 @@ Control j'0hn, our hero by using the arrow keys to traverse the various rooms. U
 space bar to make j'0hn swing his sword to tear through enemies on your way to escape,
 but don't let his health get too low. If you do, our hero will be defeated and the land
 will fall into darkness. Keep your eye out for hidden rooms, containing boosts to health,
-defense, and speed.
+defense, and speed. Try to get the highest score you can! Your score goes up for every enemy
+you kill, but the longer it takes for you to escape, the more your score goes down at the end.
 
 ### Silme
 
@@ -59,10 +60,12 @@ mentioned.
 
 Image Sources:
 
-http://fishssticks.tumblr.com/post/160558029798/friend-i-think-hyperfixationspecial-interest - speed powerup
+http://fishssticks.tumblr.com/post/160558029798/friend-i-think-hyperfixationspecial-interest - Speed powerup
 
-https://rvros.itch.io/animated-pixel-hero - hero
+https://rvros.itch.io/animated-pixel-hero - Hero
 
 https://opengameart.org/content/slime-2-frame-animation-32x32 - Tiny colored slimes
 
-https://uilleaggodwin.itch.io/roguelike-dungeon-asset-bundle - green 8-bit slimes, health pots
+https://uilleaggodwin.itch.io/roguelike-dungeon-asset-bundle - Green/red 8-bit slimes, health pots
+
+http://pixelartmaker.com/art/cc9ed077aed46f5 - Shield
