@@ -4,8 +4,8 @@ from random import choice, randint
 
 WIDTH = 800
 HEIGHT = 800
-EDGEXL = 85
-EDGEXR = WIDTH - 170
+EDGEXL = 45
+EDGEXR = WIDTH - 130
 EDGEYT = 85
 EDGEYB = HEIGHT - 200
 
@@ -16,12 +16,16 @@ class Game:
         pygame.init()
 
         self.font = pygame.font.Font('freesansbold.ttf',32)
-        self.text = self.font.render('Dungeon Master', True,(255,255,255),(0,0,0))
+        self.text = self.font.render('Dunegon Master', True,(255,255,255),(0,0,0))
         self.endtext = self.font.render('Game Over!',True,(255,255,255),(0,0,0))
         self.wintext = self.font.render('You Win!',True,(255,255,255),(0,0,0))
 
+        self.timer = Timer()
+        self.killCounter = KillCounter()
+        self.scoreCounter = Score()
+
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("Stalin")
+        pygame.display.set_caption("Dunegon Master")
         self.clock = pygame.time.Clock()
         self.mobs = []
         self.healthBar = HealthBar()
@@ -29,28 +33,32 @@ class Game:
         self.existingdoors = []
         self.existingwalls = []
         self.existingItems = []
-        image1 = pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/dunegon.png')
+        image1 = pygame.image.load('dungeon.png')
+        image2 = pygame.image.load('hiddenRoom.png')
         self.bg = image1
-        self.room1 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25) # HiddenDoor(300,300)
-        self.room2 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room3 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room4 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25)
-        self.room5 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room6 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room7 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25)
-        self.room8 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room9 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room10 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25)
-        self.room11 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room12 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room13 = Room([LockedDoor(35,360), Door(700,360), HiddenDoor(367,85)], [], image1, 25)
-        self.room14 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.room15 = Room([LockedDoor(35,360), Door(700,360)], [], image1, 25)
-        self.hiddenRoom = HiddenRoom([Door(700,360)],[],image1, 3)
+        self.room1 = Room([ Door(700,360), HiddenDoor(367,90)], [], image1, 45) # HiddenDoor(300,300)
+        self.room2 = Room([Door(700,360)], [], image1, 45)
+        self.room3 = Room([ Door(700,360)], [], image1, 45)
+        self.room4 = Room([ Door(700,360), HiddenDoor(367,90)], [], image1, 45)
+        self.room5 = Room([ Door(700,360)], [], image1, 45)
+        self.room6 = Room([ Door(700,360)], [], image1, 45)
+        self.room7 = Room([ Door(700,360), HiddenDoor(367,90)], [], image1, 45)
+        self.room8 = Room([ Door(700,360)], [], image1, 45)
+        self.room9 = Room([ Door(700,360)], [], image1, 45)
+        self.room10 = Room([ Door(700,360), HiddenDoor(367,90)], [], image1, 45)
+        self.room11 = Room([ Door(700,360)], [], image1, 45)
+        self.room12 = Room([ Door(700,360)], [], image1, 45)
+        self.room13 = Room([ Door(700,360), HiddenDoor(367,90)], [], image1, 45)
+        self.room14 = Room([ Door(700,360)], [], image1, 45)
+        self.room15 = Room([ Door(700,360)], [], image1, 45)
+        self.finalRoom = Room([LockedDoor(35,360), Door(700,360)], [], image1, 45)
+        self.hiddenRoom = HiddenRoom([Door(700,360)],[],image2, 0)
         self.roomList = [self.room1, self.room2, self.room3, self.room4, self.room5, self.room6, self.room7, self.room8, self.room9, self.room10, self.room11, self.room12, self.room13, self.room14, self.room15]
         self.currentRoom = choice(self.roomList)
         self.exploredRoomList = []
         self.exploredRoomList.append(self.currentRoom)
+
+        self.frameCount = 0
 
     def text_objects(self,text, font):
         textsurface = font.render(text, True, (255,255,255))
@@ -106,11 +114,10 @@ class Game:
         self.begin()
     
     def win_screen(self):
-        pygame.mixer.music.stop()
         self.screen.fill((0,0,0))
         textrect = self.wintext.get_rect()
         textrect = (300,350)
-        self.screen.blit(self.endtext,textrect)
+        self.screen.blit(self.wintext,textrect)
         pygame.display.update()
         time.sleep(2)
         self.quitgame
@@ -122,7 +129,7 @@ class Game:
 
     def start(self):
         done = False
-        pygame.mixer.music.load('/home/blackn/preAPCS/mygame-t-chart-nation/541681556736144.ogg')
+        pygame.mixer.music.load('escape.wav')
         pygame.mixer.music.play(-1)
         self.pastRoom = self.currentRoom
         self.loadRoom(self.currentRoom)
@@ -212,20 +219,28 @@ class Game:
                     self.character.health += 75
                     if self.character.health > 300:
                         self.character.health = 300
-                print(self.character.health,self.character.defense,self.character.speed)
                 self.existingItems = []
                 newRoomLoop = True
                 while newRoomLoop:
                     room = choice(self.roomList)
                     if room not in self.exploredRoomList or len(self.exploredRoomList) == len(self.roomList):
                         if len(self.exploredRoomList) == len(self.roomList):
-                            self.win_screen()
+                            if self.currentRoom == self.finalRoom:
+                                self.win_screen()
+                            else:
+                                self.loadRoom(self.finalRoom)
                         else:
                             self.currentRoom = room
                             newRoomLoop = False
 
             self.healthBar.draw(self.character.health, self.screen)
-                
+            if self.frameCount == 0:
+                self.timer.time += 1
+            self.timer.draw(self.screen)
+            self.frameCount = (self.frameCount + 1) % 30
+            self.killCounter.draw(self.screen) 
+            self.scoreCounter.score = self.killCounter.killCount - self.timer.time
+            self.scoreCounter.draw(self.screen)
 
             if self.checkDoors() != "HiddenDoor" and self.checkDoors() != "None":
                 newRoomLoop = True
@@ -258,6 +273,7 @@ class Game:
                         self.lose_screen()
                     return
                 else:
+                    self.killCounter.killCount += 1
                     if mob.__class__.__name__ == "Hydra":
                         for i in range(2):
                             self.mobs.append(Slime1())
@@ -320,7 +336,7 @@ class Game:
 
 
     def loadRoom(self, Room):
-        time.sleep(2)
+        # time.sleep(2)
         self.draw_bg(Room.background)
         self.existingdoors = []
         for door in Room.doorList:
@@ -366,16 +382,16 @@ class Hero:
         self.defense = 0
         self.speed = 0
         self.frame = 0
-        self.animation = pygame.transform.scale((pygame.image.load('/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-idle-00.png')), (80,80))
+        self.animation = pygame.transform.scale((pygame.image.load('adventurer-idle-00.png')), (80,80))
         self.orientation = "right"
         self.moveRight = []
         self.moveAttack = []
         self.attackAnimation = -1
         self.attacking = False
         for i in range(6):
-            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-run-0{i}.png'), (80,80)))
+            self.moveRight.append(pygame.transform.scale(pygame.image.load(f'adventurer-run-0{i}.png'), (80,80)))
         for i in range(6):
-            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'/home/blackn/preAPCS/mygame-t-chart-nation/images/adventurer-attack2-0{i}.png'), (80,80)))
+            self.moveAttack.append(pygame.transform.scale(pygame.image.load(f'adventurer-attack2-0{i}.png'), (80,80)))
         self.rect = pygame.Rect(0,0,80,80)
         self.rect.x = 100
         self.rect.y = 310
@@ -452,8 +468,8 @@ class Enemy(pygame.sprite.Sprite):
 
 class EnemyPath:
     def __init__(self):
-        self.walkright = [pygame.image.load('Red_Slime_0.png'),pygame.image.load('Red_Slime_1.png'),pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png')]
-        self.walkleft = [pygame.image.load('Green_Slime_0.png'),pygame.image.load('Green_Slime_1.png'),pygame.image.load('Yellow_Slime_0.png'),pygame.image.load('Yellow_Slime_1.png')]
+        self.walkright = [pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png'),pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png')]
+        self.walkleft = [pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png'),pygame.image.load('Blue_Slime_0.png'),pygame.image.load('Blue_Slime_1.png')]
         self.moveType = randint(1,2)
         if self.moveType == 1:
             self.moveType = "y"
@@ -616,8 +632,44 @@ class HealthBar():
         pass
 
     def draw(self, health, screen):
-        pygame.draw.rect(screen, (255,0,0), (30,30,300,10))
-        pygame.draw.rect(screen, (0,0,0), (30+health,30,300-health,10))
+        pygame.draw.rect(screen, (0,255,0), (30,30,300,10))
+        pygame.draw.rect(screen, (255,0,0), (30+health,30,300-health,10))
+
+class Timer():
+    def __init__(self):
+        self.time = 0
+        self.font = pygame.font.Font('freesansbold.ttf',15)
+    
+    def draw(self, screen):
+        time = self.font.render("Time: " + str(self.time),True,(255,0,0),(0,0,0))
+        textrect = time.get_rect()
+        textrect = (600,10)
+        screen.blit(time, textrect)
+        pygame.display.update()
+
+class KillCounter():
+    def __init__(self):
+        self.killCount = 0
+        self.font = pygame.font.Font('freesansbold.ttf',15)
+
+    def draw(self, screen):
+        killcount = self.font.render("Enemies Slain: " + str(self.killCount),True,(255,0,0),(0,0,0))
+        textrect = killcount.get_rect()
+        textrect = (400,10)
+        screen.blit(killcount, textrect)
+        pygame.display.update()
+
+class Score():
+    def __init__(self):
+        self.score = 0
+        self.font = pygame.font.Font('freesansbold.ttf',15)
+
+    def draw(self, screen):
+        score = self.font.render("Score: " + str(self.score),True,(255,0,0),(0,0,0))
+        textrect = score.get_rect()
+        textrect = (700,10)
+        screen.blit(score, textrect)
+        pygame.display.update()
 
         
 
